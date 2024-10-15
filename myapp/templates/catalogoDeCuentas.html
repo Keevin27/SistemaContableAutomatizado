@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    <table id="catalogo-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Cuenta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cuenta in cuentas %}
+            <tr data-id="{{ cuenta.id }}">
+                <td>{{ cuenta.codigo }}</td>
+                <td>{{ cuenta.nombre }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}
