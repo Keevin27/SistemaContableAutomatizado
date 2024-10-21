@@ -1,20 +1,69 @@
 {% extends 'base.html' %}
 {% block content %}
-    <table id="catalogo-table">
-        <thead>
-            <tr>
-                <th>Codigo</th>
-                <th>Cuenta</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cuenta in cuentas %}
-            <tr data-id="{{ cuenta.id }}">
-                <td>{{ cuenta.codigo }}</td>
-                <td>{{ cuenta.nombre }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo de cuentas</title>
+    <link rel="stylesheet" type ="text/css" href='{% static "catalogo.css" %}'>
+    <style>
+        .selected {
+            background-color: #ed7171;
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        header {
+            background-color: #525f6e;
+            color: #ece9e9;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Catalogo de cuentas</h1>
+    </header>
+    <main>
+        <div class="div1"><button id="agregarcuenta-btn">Agregar Cuenta</button></div>
+        <div class="contenedor">
+            <table id="registros-table">
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Cuenta</th>
+                        <th>Clasificacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuenta in cuentas %}
+                    <tr data-id="{{ cuenta.id }}">
+                        <td>{{ cuenta.codigo }}</td>
+                        <td>{{ cuenta.nombre }}</td>
+                        <td>{{ cuenta.clasificacion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>      
+        </div>
+    </main>
 
-    </table>
+    <footer>
+        <p>&copy; 2024 Sistema Contable</p>
+    </footer>
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const ingresarBtn = document.getElementById('agregarcuenta-btn');
+        
+        ingresarBtn.addEventListener('click', function() {
+                window.location.href = '/catalogo_de_cuentas/agregar_cuenta/';
+            });
+    });
+</script>
 {% endblock %}
