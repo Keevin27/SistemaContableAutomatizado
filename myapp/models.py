@@ -18,3 +18,19 @@ class Transaccion(models.Model):
     #pasivo = models.ForeignKey(Cuenta, on_delete=models.CASCADE, null= True)
     pasivo = models.CharField(max_length=50)
     montoHaber = models.DecimalField(max_digits=10, decimal_places=2)
+
+class Empleado(models.Model):
+    codigo_empleado = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=100)
+    salario = models.DecimalField(max_digits=10, decimal_places=2)
+    puesto = models.CharField(max_length=100)
+    vacaciones = models.DecimalField(max_digits=5, decimal_places=2)
+    septimo = models.DecimalField(max_digits=10, decimal_places=2)
+    isss = models.DecimalField(max_digits=10, decimal_places=2)
+    afp = models.DecimalField(max_digits=10, decimal_places=2)
+    insaforp = models.DecimalField(max_digits=10, decimal_places=2)
+    costo = models.DecimalField(max_digits=10, decimal_places=2)
+    aguinaldo = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.nombre

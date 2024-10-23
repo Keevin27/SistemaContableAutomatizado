@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Cuenta
+from .forms import EmpleadoForm
+
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
@@ -54,3 +56,15 @@ def generar_codigo(clasificacion):
         totalstr = str(total).zfill(2)
         codigo = f"51{totalstr}"
     return codigo
+
+
+def agregar_empleado(request):
+    
+    if request.method == 'POST':
+        form = EmpleadoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_empleados')  # Redirige a una lista de empleados o a donde prefieras
+    else:
+        form = EmpleadoForm()
+    return render(request, 'agregar_empleado.html', {'form': form})

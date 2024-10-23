@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Agregar Empleado</title>
+    </head>
+    <body>
+        <h1>Agregar Empleado</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Guardar</button>
+            <div class="">
+                <h1>Lista de Empleados</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código de Empleado</th>
+                            <th>Nombre</th>
+                            <th>Salario</th>
+                            <th>Puesto</th>
+                            <th>Vacaciones</th>
+                            <th>Séptimo</th>
+                            <th>ISSS</th>
+                            <th>AFP</th>
+                            <th>INSAFORP</th>
+                            <th>Costo</th>
+                            <th>Aguinaldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for empleado in empleados %}
+                        <tr>
+                            <td>{{ empleado.codigo_empleado }}</td>
+                            <td>{{ empleado.nombre }}</td>
+                            <td>{{ empleado.salario }}</td>
+                            <td>{{ empleado.puesto }}</td>
+                            <td>{{ empleado.vacaciones }}</td>
+                            <td>{{ empleado.septimo }}</td>
+                            <td>{{ empleado.isss }}</td>
+                            <td>{{ empleado.afp }}</td>
+                            <td>{{ empleado.insaforp }}</td>
+                            <td>{{ empleado.costo }}</td>
+                            <td>{{ empleado.aguinaldo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </body>
+</html>
+{% endblock %}

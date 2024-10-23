@@ -1,0 +1,55 @@
+from django import forms
+from .models import Empleado
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleado
+        fields = ['nombre', 'salario', 'puesto']
+
+    def clean_salario(self):
+        salario = self.cleaned_data.get('salario')
+        if salario <= 0:
+            raise forms.ValidationError('El salario debe ser un valor positivo.')
+        return salario
+
+    def clean_vacaciones(self):
+        vacaciones = self.cleaned_data.get('vacaciones')
+        if vacaciones < 0:
+            raise forms.ValidationError('Las vacaciones no pueden ser un valor negativo.')
+        return vacaciones
+
+    def clean_aguinaldo(self):
+        aguinaldo = self.cleaned_data.get('aguinaldo')
+        if aguinaldo < 0:
+            raise forms.ValidationError('El aguinaldo no puede ser un valor negativo.')
+        return aguinaldo
+
+    def clean_septimo(self):
+        septimo = self.cleaned_data.get('septimo')
+        if septimo < 0:
+            raise forms.ValidationError('El séptimo no puede ser un valor negativo.')
+        return septimo
+
+    def clean_isss(self):
+        isss = self.cleaned_data.get('isss')
+        if isss < 0:
+            raise forms.ValidationError('El ISSS no puede ser un valor negativo.')
+        return isss
+
+    def clean_afp(self):
+        afp = self.cleaned_data.get('afp')
+        if afp < 0:
+            raise forms.ValidationError('El AFP no puede ser un valor negativo.')
+        return afp
+
+    def clean_insaforp(self):
+        insaforp = self.cleaned_data.get('insaforp')
+        if insaforp < 0:
+            raise forms.ValidationError('El INSAFORP no puede ser un valor negativo.')
+        return insaforp
+
+    def clean_costo(self):
+        costo = self.cleaned_data.get('costo')
+        if costo < 0:
+            raise forms.ValidationError('El costo no puede ser un valor negativo.')
+        return costo
