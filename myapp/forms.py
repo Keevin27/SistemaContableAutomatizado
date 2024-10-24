@@ -1,10 +1,21 @@
 from django import forms
-from .models import Empleado
+from .models import *
 
 class EmpleadoForm(forms.ModelForm):
+
+    nombre = forms.CharField(label='Nombre', min_length=3, max_length=120, required=True, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Nombre del empleado','pattern':'[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+'}))
+    puesto = forms.CharField(label='Puesto', min_length=3, max_length=120, required=True, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Puesto del empleado','pattern':'[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+'}))
+    nominal = forms.DecimalField(label='Nominal', max_digits=10, decimal_places=2, required=True, widget=forms.NumberInput(attrs={'class':'form-control','placeholder':'$0.00'}))
+
     class Meta:
         model = Empleado
-        fields = ['nombre', 'salario', 'puesto']
+        fields = ['nombre', 'nominal', 'puesto']
+
+    def clean_nominal(self):
+        nominal = self.cleaned_data.get('nominal')
+        if nominal <= 0:
+            raise forms.ValidationError('El nominal debe ser un valor positivo.')
+        return nominal
 
     def clean_salario(self):
         salario = self.cleaned_data.get('salario')

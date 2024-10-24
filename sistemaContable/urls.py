@@ -23,6 +23,6 @@ urlpatterns = [
     path('', home, name='home'),
     path('catalogo_de_cuentas/', catalogoDeCuentas, name='catalogodecuentas'),
     path('catalogo_de_cuentas/agregar_cuenta/', agregarCuenta, name='agregarcuenta'),
-    path('mod', agregar_empleado, name='agregar_empleado'),
-    path('mod/agregar_empleado', agregar_empleado, name='agregar_empleado'),
+    path('costo_mano_obra', costo_mano_obra, name='costo_mano_obra'),
+    path('costo_mano_obra/eliminar_empleado', eliminar_empleado, name='eliminar_empleado'),
 ]

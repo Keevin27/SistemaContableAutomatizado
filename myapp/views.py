@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from .models import Cuenta
-from .forms import EmpleadoForm
+from .models import *
+from .forms import *
+from decimal import Decimal
 
 # Create your views here.
 def home(request):
@@ -57,14 +58,42 @@ def generar_codigo(clasificacion):
         codigo = f"51{totalstr}"
     return codigo
 
+def costo_mano_obra(request):
 
-def agregar_empleado(request):
-    
     if request.method == 'POST':
+        
         form = EmpleadoForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('lista_empleados')  # Redirige a una lista de empleados o a donde prefieras
+            empleado = Empleado()
+            nominal = form.cleaned_data['nominal']
+            vacaciones = (nominal * 15 + (Decimal(0.3) * nominal * 15))/52
+            septimo = nominal * 2
+            aguinaldo = (21 * nominal) / 52
+            salario = nominal * 5 + septimo + aguinaldo + vacaciones
+            isss = salario * Decimal(0.075)
+            afp = salario * Decimal(0.08)
+            costo = salario + isss + afp
+            empleado.nombre = form.cleaned_data['nombre']
+            empleado.puesto = form.cleaned_data['puesto']
+            empleado.nominal = nominal
+            empleado.vacaciones = vacaciones
+            empleado.septimo = septimo
+            empleado.aguinaldo = aguinaldo
+            empleado.salario = salario
+            empleado.isss = isss
+            empleado.afp = afp
+            empleado.insaforp = 0
+            empleado.costo = costo
+            empleado.save()
+            return redirect('costo_mano_obra')  # Redirige a una lista de empleados o a donde prefieras obviamente :v
     else:
         form = EmpleadoForm()
-    return render(request, 'agregar_empleado.html', {'form': form})
+    return render(request, 'costo_mano_obra.html', {'form': form, 'empleados': Empleado.objects.all()})
+
+def eliminar_empleado(request):
+    if request.method == 'POST':
+        data = request.POST
+        id = data['id']
+        empleado = Empleado.objects.get(id = id)
+        empleado.delete()
+    return redirect('costo_mano_obra')
