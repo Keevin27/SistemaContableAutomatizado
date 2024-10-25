@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transacciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        label {
+            display: inline;
+            margin-bottom: 5px;
+        }
+        select, textarea{
+            width: 20%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        input[type="text"] {
+            width: 30%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            width: 30%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            text-align: right;
+        }
+        .total-amount {
+            font-weight: bold;
+        }
+        #agregar-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #B11C19;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 20%;
+        }
+        #agregar-btn:hover {
+            background-color: #45a049;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Transacciones</h2>
+        <div class="form-group">
+            <label for="cuentaCargar">Cuenta a cargar:</label>
+            <select  id="cuentaCargar" required>
+                <!--agregar jinja para desplegar las cuentas-->
+            </select>
+            <label for="montoCargar">Monto:</label>
+            <input type="number" id="montoCargar" name="montoCargar" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+            <label for="cuentaAbonar">Cuenta a Abonar:</label>
+            <select  id="cuentaAbonar" required>
+                <!--agregar jinja para desplegar las cuentas-->
+            </select>
+            <label for="montoAbonar">Monto:</label>
+            <input type="number" id="montoAbonar" name="montoAbonar" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+            <label for="agregarIVA">Aplicar IVA</label>
+            <input type="checkbox" id="agregarIVA"> 
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <input type="text" id="descripcion" placeholder="ingrese una descripcion" required>
+            <button id="agregar-btn">Agregar</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Código</th>
+                    <th>Cuenta</th>
+                    <th>Descripción</th>
+                    <th>Movimientos Debe</th>
+                    <th>Movimientos Haber</th>
+                </tr>
+            </thead>
+            <tbody id="transacciones-body">
+                
+            </tbody>
+        </table>
+        <div class="total">
+            <span class="total-amount">Total Debe: $<span id="totalDebe">0.00</span></span> 
+            <span class="total-amount">Total Haber: $<span id="totalHaber">0.00</span></span>
+        </div>
+    </div>
+
+    <script>
+        let totalDebe = 0;
+        let totalHaber = 0;
+
+        document.getElementById("agregar-btn").addEventListener("click", function () {
+            const codigoCuenta = document.getElementById("codigoCuenta").value;
+            const descripcion = document.getElementById("descripcion").value;
+            const debe = parseFloat(document.getElementById("debe").value) || 0;
+            const haber = parseFloat(document.getElementById("haber").value) || 0;
+            const fecha = new Date().toLocaleDateString();
+
+            if (!codigoCuenta || (!debe && !haber)) {
+                alert("Por favor ingrese un código de cuenta y al menos un movimiento.");
+                return;
+            }
+
+            // Agregar fila a la tabla
+            const tableBody = document.getElementById("transacciones-body");
+            const row = tableBody.insertRow();
+            row.insertCell(0).textContent = fecha;
+            row.insertCell(1).textContent = codigoCuenta;
+            row.insertCell(2).textContent = descripcion;
+            row.insertCell(3).textContent = debe.toFixed(2);
+            row.insertCell(4).textContent = haber.toFixed(2);
+
+            // Actualizar totales
+            totalDebe += debe;
+            totalHaber += haber;
+            document.getElementById("totalDebe").textContent = totalDebe.toFixed(2);
+            document.getElementById("totalHaber").textContent = totalHaber.toFixed(2);
+
+            // Limpiar los campos
+            document.getElementById("codigoCuenta").value = '';
+            document.getElementById("descripcion").value = '';
+            document.getElementById("debe").value = '';
+            document.getElementById("haber").value = '';
+        });
+    </script>
+</body>
+</html>
