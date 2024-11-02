@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from .models import *
 from .forms import *
 from decimal import Decimal
@@ -170,3 +171,24 @@ def eliminar_empleado(request):
         empleado = Empleado.objects.get(id = id)
         empleado.delete()
     return redirect('costo_mano_obra')
+
+def orden_de_desarrollo(request):
+
+    return render(request)
+
+def control_de_costos(request):
+    if request.method == 'POST':
+        form = AsignacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_asignaciones')
+    else:
+        form = AsignacionForm()
+    return render(request, 'control_de_costos.html', {'form': form, 'empleados': Empleado.objects.all()})
+
+def get_empleados(request):
+    if request.method == 'GET':
+        empleados =  Empleado.objects.all().values('id','nombre','puesto','costo')
+        lista_empleados = list(empleados)
+        return JsonResponse(lista_empleados, safe = False)
+    return JsonResponse(data = {'mensaje': 'No data', 'estado':'-1'})

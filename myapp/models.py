@@ -35,3 +35,14 @@ class Empleado(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class OrdenDeDesarrollo(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+
+class Asignacion(models.Model):
+    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    orden = models.ForeignKey(OrdenDeDesarrollo, on_delete=models.CASCADE)
+    fecha_asignacion = models.DateField(auto_now_add=True)
+    estado = models.CharField(max_length=50, choices=[('pendiente', 'Pendiente'), ('en_progreso', 'En Progreso'), ('completado', 'Completado')])
+

@@ -71,3 +71,8 @@ class EmpleadoForm(forms.ModelForm):
         if costo < 0:
             raise forms.ValidationError('El costo no puede ser un valor negativo.')
         return costo
+
+class AsignacionForm(forms.ModelForm):
+    class Meta:
+        model = Asignacion
+        fields = ['empleado', 'orden', 'estado']
