@@ -6,11 +6,18 @@ class EmpleadoForm(forms.ModelForm):
     nombre = forms.CharField(label='Nombre', min_length=3, max_length=120, required=True, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Nombre del empleado','pattern':'[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+'}))
     puesto = forms.CharField(label='Puesto', min_length=3, max_length=120, required=True, widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Puesto del empleado','pattern':'[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+'}))
     nominal = forms.DecimalField(label='Nominal', max_digits=10, decimal_places=2, required=True, widget=forms.NumberInput(attrs={'class':'form-control','placeholder':'$0.00'}))
+    anios = forms.IntegerField(label='Años', min_value=0, max_value=100, required=True, widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'1', 'step':'1'}))
 
     class Meta:
         model = Empleado
-        fields = ['nombre', 'nominal', 'puesto']
+        fields = ['nombre', 'nominal', 'puesto', 'anios']
 
+    def clean_nominal(self):
+        anios = self.cleaned_data.get('anios')
+        if anios <= 0:
+            raise forms.ValidationError('Los años deben de ser un valor positivo.')
+        return anios
+    
     def clean_nominal(self):
         nominal = self.cleaned_data.get('nominal')
         if nominal <= 0:

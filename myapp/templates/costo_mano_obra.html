@@ -9,56 +9,64 @@
     </head>
     <body>
         <div class="container-fluid">
-            <h1>Agregar Empleado</h1>
-            <form method="post" class="form-inline">
+            <h1 style="text-align: center;">Control de Mano de Obra</h1>
+            <h3>Agregar Empleado</h3>
+            <form method="post" id="agregar_empleado" name="agregar_empleado" class="form-inline">
                 <div class="form-group mb-2">
                     {% csrf_token %}
                     {{ form }}
-                    <button type="submit" class="btn btn-primary ml-3 mt-1">Guardar</button>
+                    <button type="submit" form="agregar_empleado" class="btn btn-primary ml-3 mt-1">Guardar</button>
+                    <button type="reset" form="agregar_empleado" class="btn btn-secondary ml-3 mt-1">Limpiar</button>
                 </div>
             </form>
         </div>
         <div class="table-responsive p-3 mb-3">
-            <h1>Lista de Empleados - Costo Semanal</h1>
-            <form method="post" action="costo_mano_obra/eliminar_empleado">
+            <h3 style="text-align: center;">Lista de Empleados - Costo Semanal</h3>
+            <form method="post" id="tabla_empleados" name="tabla_empleados" action="costo_mano_obra/eliminar_empleado">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Eliminar</button>
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Select</th>
-                            <th scope="col" id="nombre">Nombre</th>
-                            <th scope="col" id="salario">Salario</th>
-                            <th scope="col" id="puesto">Puesto</th>
-                            <th scope="col" id="vacaciones">Vacaciones</th>
-                            <th scope="col" id="septimo">Séptimo</th>
-                            <th scope="col" id="isss">ISSS</th>
-                            <th scope="col" id="afp">AFP</th>
-                            <th scope="col" id="insaforp">INSAFORP</th>
-                            <th scope="col" id="costo">Costo</th>
-                            <th scope="col" id="aguinaldo">Aguinaldo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for empleado in empleados %}
-                        <tr>
-                            <td><input type="radio" name="id" value="{{ empleado.id }}"></td>
-                            <td>{{ empleado.nombre }}</td>
-                            <td>{{ empleado.salario }}</td>
-                            <td>{{ empleado.puesto }}</td>
-                            <td>{{ empleado.vacaciones }}</td>
-                            <td>{{ empleado.septimo }}</td>
-                            <td>{{ empleado.isss }}</td>
-                            <td>{{ empleado.afp }}</td>
-                            <td>{{ empleado.insaforp }}</td>
-                            <td>{{ empleado.costo }}</td>
-                            <td>{{ empleado.aguinaldo }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <h5>Opciones</h5>
+                <button type="submit" form="tabla_empleados" class="btn btn-danger">Eliminar</button>
+                <button type="submit" form="tabla_empleados" class="btn btn-success" onclick="actualizar('costo_mano_obra/actualizar_empleado')">Actualizar</button>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Select</th>
+                                <th scope="col" id="nombre">Nombre</th>
+                                <th scope="col" id="puesto">Puesto</th>
+                                <th scope="col" id="salario">Salario Nominal</th>
+                                <th scope="col" id="salario">Salario Cancelado</th>
+                                <th scope="col" id="vacaciones">Vacaciones</th>
+                                <th scope="col" id="aguinaldo">Aguinaldo</th>
+                                <th scope="col" id="septimo">Desembolso Semanal</th>
+                                <th scope="col" id="isss">ISSS</th>
+                                <th scope="col" id="afp">AFP</th>
+                                <th scope="col" id="insaforp">INSAFORP</th>
+                                <th scope="col" id="costo">Costo Semanal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empleado in empleados %}
+                            <tr>
+                                <td><input type="radio" name="id" value="{{ empleado.id }}" checked></td>
+                                <td>{{ empleado.nombre }}</td>
+                                <td>{{ empleado.puesto }}</td>
+                                <td>{{ empleado.nominal }}</td>
+                                <td>{{ empleado.salario }}</td>
+                                <td>{{ empleado.vacaciones }}</td>
+                                <td>{{ empleado.aguinaldo }}</td>
+                                <td>{{ empleado.septimo }}</td>
+                                <td>{{ empleado.isss }}</td>
+                                <td>{{ empleado.afp }}</td>
+                                <td>{{ empleado.insaforp }}</td>
+                                <td>{{ empleado.costo }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
             </form>
         </div> 
     </body>
+    <script src="{% static '/js/mo.js' %}" ></script>
 </html>
 {% endblock %}

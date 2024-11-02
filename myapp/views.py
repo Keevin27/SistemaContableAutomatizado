@@ -61,18 +61,34 @@ def generar_codigo(clasificacion):
 def costo_mano_obra(request):
 
     if request.method == 'POST':
-        
+
         form = EmpleadoForm(request.POST)
+
         if form.is_valid():
+
             empleado = Empleado()
             nominal = form.cleaned_data['nominal']
             vacaciones = (nominal * 15 + (Decimal(0.3) * nominal * 15))/52
-            septimo = nominal * 2
-            aguinaldo = (21 * nominal) / 52
-            salario = nominal * 5 + septimo + aguinaldo + vacaciones
+            septimo = nominal * 7
+            anios = form.cleaned_data['anios']
+            aguinaldo = 0
+
+            if anios >= 1 and anios < 3 :
+                aguinaldo = (15 * nominal) / 52
+            if anios >= 3 and anios < 10:
+                aguinaldo = (19 * nominal) / 52
+            if anios > 10:
+                aguinaldo = (19 * nominal) / 52
+
+            salario = septimo + vacaciones # Salario cancelado
+
             isss = salario * Decimal(0.075)
             afp = salario * Decimal(0.08)
-            costo = salario + isss + afp
+            insaforp = 0
+            #salario +=  vacaciones
+
+            costo = salario + vacaciones + isss + afp + insaforp
+
             empleado.nombre = form.cleaned_data['nombre']
             empleado.puesto = form.cleaned_data['puesto']
             empleado.nominal = nominal
@@ -82,13 +98,70 @@ def costo_mano_obra(request):
             empleado.salario = salario
             empleado.isss = isss
             empleado.afp = afp
-            empleado.insaforp = 0
+            empleado.insaforp = insaforp
             empleado.costo = costo
             empleado.save()
+
             return redirect('costo_mano_obra')  # Redirige a una lista de empleados o a donde prefieras obviamente :v
     else:
         form = EmpleadoForm()
     return render(request, 'costo_mano_obra.html', {'form': form, 'empleados': Empleado.objects.all()})
+
+
+def actualizar_empleado(request):
+
+    if request.method == 'POST':
+
+        form = EmpleadoForm(request.POST)
+
+        if form.is_valid():
+            data = request.POST
+            id = data['id']
+            empleado = Empleado.objects.get(id = id)
+            
+            nominal = form.cleaned_data['nominal']
+            vacaciones = (nominal * 15 + (Decimal(0.3) * nominal * 15))/52
+            septimo = nominal * 7
+            anios = form.cleaned_data['anios']
+            aguinaldo = 0
+            
+            if anios >= 1 and anios < 3 :
+                aguinaldo = (15 * nominal) / 52
+            if anios >= 3 and anios < 10:
+                aguinaldo = (19 * nominal) / 52
+            if anios > 10:
+                aguinaldo = (19 * nominal) / 52
+
+            salario = septimo + vacaciones # Salario cancelado
+
+            isss = salario * Decimal(0.075)
+            afp = salario * Decimal(0.08)
+            insaforp = 0
+            #salario +=  vacaciones
+
+            costo = salario + vacaciones + isss + afp + insaforp
+
+            empleado.nombre = form.cleaned_data['nombre']
+            empleado.puesto = form.cleaned_data['puesto']
+            empleado.nominal = nominal
+            empleado.vacaciones = vacaciones
+            empleado.septimo = septimo
+            empleado.aguinaldo = aguinaldo
+            empleado.salario = salario
+            empleado.isss = isss
+            empleado.afp = afp
+            empleado.insaforp = insaforp
+            empleado.costo = costo
+            empleado.anios =  anios
+            empleado.save()
+
+            return redirect('costo_mano_obra')  # Redirige a una lista de empleados o a donde prefieras obviamente :v
+        
+        data = request.POST
+        id = data['id']
+        empleado = Empleado.objects.get(id = id)
+
+    return render(request, 'actualizar_empleado.html', {'empleado': empleado})
 
 def eliminar_empleado(request):
     if request.method == 'POST':

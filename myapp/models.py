@@ -31,6 +31,7 @@ class Empleado(models.Model):
     insaforp = models.DecimalField(max_digits=10, decimal_places=2)
     costo = models.DecimalField(max_digits=10, decimal_places=2)
     aguinaldo = models.DecimalField(max_digits=10, decimal_places=2)
+    anios = models.IntegerField(default=1)
 
     def __str__(self):
         return self.nombre

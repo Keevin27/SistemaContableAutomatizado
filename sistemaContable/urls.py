@@ -24,5 +24,6 @@ urlpatterns = [
     path('catalogo_de_cuentas/', catalogoDeCuentas, name='catalogodecuentas'),
     path('catalogo_de_cuentas/agregar_cuenta/', agregarCuenta, name='agregarcuenta'),
     path('costo_mano_obra', costo_mano_obra, name='costo_mano_obra'),
+    path('costo_mano_obra/actualizar_empleado', actualizar_empleado, name='actualizar_empleado'),
     path('costo_mano_obra/eliminar_empleado', eliminar_empleado, name='eliminar_empleado'),
 ]
