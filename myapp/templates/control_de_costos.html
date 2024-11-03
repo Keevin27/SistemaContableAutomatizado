@@ -207,8 +207,9 @@
             const tiempo_estimado = document.getElementById('tiempo_estimado');
             const costo_estimado = document.getElementById('costo_producto');
             const precio_estimado  = document.getElementById('precio_venta');
+
             let tiempo = 0, precio_venta = 0, costo_producto = 0, totalLOC = 0, lineas_programadas = 0, precio_por_LOC = 0;
-            precio_por_LOC = parseFloat(costo_por_linea.innerText) || 1;
+            precio_por_LOC = parseFloat(costo_por_linea.innerText);
             totalLOC = calcularTotalLOC() || 1;
             lineas_programadas = parseFloat(lineas_semana.value) || 1;
 
@@ -216,7 +217,7 @@
 
             costo_producto = totalLOC * precio_por_LOC;
             precio_venta = costo_producto + costo_producto * 0.3;
-            console.log("tiempo " + tiempo + " lineas_programadas " + lineas_programadas + " totalLOC " + totalLOC);
+            console.log(precio_por_LOC + " " + " tiempo " + tiempo + " lineas_programadas " + lineas_programadas + " totalLOC " + totalLOC);
             costo_estimado.innerText = costo_producto.toFixed(2);
             tiempo_estimado.innerText = tiempo.toFixed(2).toString() + " semanas";
             precio_estimado.innerText = precio_venta.toFixed(2);
