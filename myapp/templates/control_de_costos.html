@@ -44,11 +44,14 @@
                 <h6>MOD: </h6><p id="mo_directa"></p>
                 <h6>MOI: </h6><p id="mo_indirecta"></p>
                 <h6>CIF: </h6><p id="cif"></p>
+                <h6>Costo por linea de codigo: </h6><p id="costo_por_linea"></p>
             </div>
             <div class="col-sm">
                 <label for="lineas_semana">Lineas Semana:</label>
-                <input type="number" name="lineas_semana" class="form-control" placeholder="1" step="1" min="1" max="" required="" id="lineas_semana" value="0">
-                <h6>Costo por linea de codigo: </h6><p id="costo_por_linea"></p>  
+                <input type="number" name="lineas_semana" class="form-control" placeholder="1" step="1" min="1" max="" required="" id="lineas_semana" value="" oninput="calcularCostos()">
+                <h6>Tiempo estimado: </h6><p id="tiempo_estimado"></p>  
+                <h6>Costo del producto: </h6><p id="costo_producto"></p>
+                <h6>Precio de venta: </h6><p id="precio_venta"></p>
             </div>
         </div>
     </div>
@@ -112,6 +115,7 @@
         mo_indirecta.innerText = costo_indirecto.toFixed(2);
         mo_cif.innerText = cif.toFixed(2);
         calcularCostoLOC();
+        calcularCostos();
     }
 
     function obtenerDatos() {
@@ -190,7 +194,32 @@
             }
             else {
                 estimarLineas(cell);
+                calcularCostos();
             }
+        }
+
+        function calcularCostos() {
+            const lineas_semana = document.getElementById('lineas_semana');
+            const mo_directa = document.getElementById('mo_directa');
+            const mo_indirecta = document.getElementById('mo_indirecta');
+            const mo_cif = document.getElementById('cif');
+            const costo_por_linea = document.getElementById('costo_por_linea');
+            const tiempo_estimado = document.getElementById('tiempo_estimado');
+            const costo_estimado = document.getElementById('costo_producto');
+            const precio_estimado  = document.getElementById('precio_venta');
+            let tiempo = 0, precio_venta = 0, costo_producto = 0, totalLOC = 0, lineas_programadas = 0, precio_por_LOC = 0;
+            precio_por_LOC = parseFloat(costo_por_linea.innerText) || 1;
+            totalLOC = calcularTotalLOC() || 1;
+            lineas_programadas = parseFloat(lineas_semana.value) || 1;
+
+            tiempo = totalLOC / lineas_programadas;
+
+            costo_producto = totalLOC * precio_por_LOC;
+            precio_venta = costo_producto + costo_producto * 0.3;
+            console.log("tiempo " + tiempo + " lineas_programadas " + lineas_programadas + " totalLOC " + totalLOC);
+            costo_estimado.innerText = costo_producto.toFixed(2);
+            tiempo_estimado.innerText = tiempo.toFixed(2).toString() + " semanas";
+            precio_estimado.innerText = precio_venta.toFixed(2);
         }
 
         function estimarLineas(cell) {
@@ -235,11 +264,7 @@
 
             let total_lineas_estimadas = 0, lineas_estimadas = 0, precio_por_linea = 0;
 
-            for (let i = 0; i < rows.length; i++) {
-                const cells = rows[i].getElementsByTagName('td');
-                lineas_estimadas = parseFloat(cells[5].innerText) || 0;
-                total_lineas_estimadas += lineas_estimadas;
-            }
+            total_lineas_estimadas = calcularTotalLOC();
 
             if(total_lineas_estimadas == 0)
                 total_lineas_estimadas = 1;
@@ -250,8 +275,18 @@
             return precio_por_linea;
         }
 
-    </script>
+        function calcularTotalLOC() {
+            const table = document.getElementById('estimacion');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            let total_LOC = 0, lineas_estimadas = 0;
 
-    
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                lineas_estimadas = parseFloat(cells[5].innerText) || 0;
+                total_LOC += lineas_estimadas;
+            }
+            return total_LOC;
+        }
+    </script>  
 </html>
 {% endblock %}
