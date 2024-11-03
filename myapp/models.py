@@ -34,3 +34,20 @@ class Empleado(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class Periodo(models.Model):
+    numero = models.IntegerField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(null=True)
+    aReinvertir = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+class CuentaPeriodica(models.Model):
+    codigo = models.CharField(max_length=4)
+    periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=50)
+    debe = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    haber = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    ajusteDebe = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    ajusteHaber = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    estadoResultado = models.BooleanField(null=False)
+    estadoCapital = models.BooleanField(null=False)
+

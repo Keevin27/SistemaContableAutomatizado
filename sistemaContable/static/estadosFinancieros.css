@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #525f6e;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+main {
+    padding: 20px;
+}
+.div1 {
+    text-align: center;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #655f5f;
+    padding: 8px;
+}
+th {
+    background-color: #f0f0f0;
+    text-align: center;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #525f6e;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+button:hover {
+    transform: scale(1.1);
+    background-color: #b11c19;
+}
+.contenedor {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgb(243, 231, 230);
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+input{
+    background-color: rgb(243, 231, 230);
+    margin: 0 auto;
+}
+
+.horizontal-buttons {
+    display: flex;
+    gap: 10px; /* Espacio entre cada botón */
+}
+
+.botonDePeriodo {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    font-weight: bold;
+    border: 2px solid #b11c19; /* Color del borde */
+    border-radius: 20px;
+    background-color: #525f6e; /* Color de fondo */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.botonDePeriodo:hover {
+    background-color: #b11c19;
+    color: #ffffff; /* Cambia el color de texto al pasar el mouse */
+    transform: scale(1.1); /* Aumenta un poco el tamaño al hacer hover */
+}

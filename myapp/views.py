@@ -2,12 +2,27 @@ from django.shortcuts import render, redirect
 from .models import *
 from .forms import *
 from decimal import Decimal
+from django.db.models import Case, When, Value
+from datetime import date
+from django.http import JsonResponse
+import json
 
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
 def catalogoDeCuentas(request):
-    cuentas = Cuenta.objects.all()
+    cuentas = Cuenta.objects.all().order_by(
+            Case(
+                When(clasificacion='Activo corriente', then=Value(1)),
+                When(clasificacion='Activo no corriente', then=Value(2)),
+                When(clasificacion='Pasivo corriente', then=Value(3)),
+                When(clasificacion='Pasivo no corriente', then=Value(4)),
+                When(clasificacion='Patrimonio', then=Value(4)),
+                When(clasificacion='Gastos', then=Value(5)),
+                When(clasificacion='Ingresos', then=Value(6)),
+                When(clasificacion='Cierre', then=Value(7)),
+            )
+        )
     return render(request, 'catalogoDeCuentas.html', {'cuentas': cuentas})
 def agregarCuenta(request):
     if request.method == 'GET':
@@ -56,6 +71,10 @@ def generar_codigo(clasificacion):
         total = Cuenta.objects.filter(clasificacion='Ingresos').count() + 1
         totalstr = str(total).zfill(2)
         codigo = f"51{totalstr}"
+    elif clasificacion == 'Cierre':
+        total = Cuenta.objects.filter(clasificacion='Cierre').count() + 1
+        totalstr = str(total).zfill(2)
+        codigo = f"61{totalstr}"
     return codigo
 
 def costo_mano_obra(request):
@@ -97,3 +116,87 @@ def eliminar_empleado(request):
         empleado = Empleado.objects.get(id = id)
         empleado.delete()
     return redirect('costo_mano_obra')
+
+def estadosFinancieros(request):
+    if request.method == 'GET':
+        cuentas = Cuenta.objects.all().order_by(
+            Case(
+                When(clasificacion='Activo corriente', then=Value(1)),
+                When(clasificacion='Activo no corriente', then=Value(2)),
+                When(clasificacion='Pasivo corriente', then=Value(3)),
+                When(clasificacion='Pasivo no corriente', then=Value(4)),
+                When(clasificacion='Patrimonio', then=Value(4)),
+                When(clasificacion='Gastos', then=Value(5)),
+                When(clasificacion='Ingresos', then=Value(6)),
+                When(clasificacion='Cierre', then=Value(7)),
+            )
+        )
+        try:
+            periodos = Periodo.objects.all()
+        except Periodo.DoesNotExist:
+            periodos = None  
+        
+        return render(request, 'estadosFinancieros.html', {'cuentas': cuentas, 'periodos': periodos})
+    else:
+        periodo = nuevo_periodo()
+        datos = json.loads(request.body)
+        periodo.aReinvertir = datos.get('utilidadInvertida', 0)
+        periodo.save()
+        try:
+            cuentaCapital = Cuenta.objects.get(nombre='Capital')
+        except Cuenta.DoesNotExist:
+            cod = generar_codigo('Patrimonio')
+            cuentaCapital = Cuenta.objects.create(nombre = 'Capital', codigo = cod, clasificacion='Patrimonio')
+        try:
+            cuentaCapitalNoInvertido = Cuenta.objects.get(nombre='Capital no invertido')
+        except Cuenta.DoesNotExist:
+            cod = generar_codigo('Cierre')
+            cuentaCapitalNoInvertido = Cuenta.objects.create(nombre = 'Capital no invertido', codigo = cod, clasificacion='Cierre')
+        cuentaCapital.haber = datos.get('cuentaCapitalH', 0)
+        cuentaCapital.debe = datos.get('cuentaCapitalD', 0)
+        cuentaCapital.save()
+        cuentaCapitalNoInvertido.haber += datos.get('noReinvertido', 0)
+        cuentaCapitalNoInvertido.save()
+        print('hasta aqui')
+        for cuenta_recibida in datos.get('cuentas', []):
+            cuenta = Cuenta.objects.get(codigo = cuenta_recibida['id'])
+            CuentaPeriodica.objects.create(
+                codigo = cuenta.codigo,
+                periodo = periodo,
+                nombre = cuenta.nombre,
+                debe = cuenta_recibida.get('debe', 0),
+                haber = cuenta_recibida.get('haber', 0),
+                ajusteDebe = cuenta_recibida.get('ajusteDebe', 0),
+                ajusteHaber = cuenta_recibida.get('ajusteHaber', 0),
+                estadoResultado = cuenta_recibida.get('resultadoCheckbox', False),
+                estadoCapital = cuenta_recibida.get('capitalCheckbox', False),
+            )
+            cuenta.debe = cuenta_recibida.get('generalDebe', 0)
+            cuenta.haber = cuenta_recibida.get('generalHaber', 0)
+            if cuenta.nombre == 'Capital':
+                cuenta.haber = datos.get('cuentaCapitalH', 0)
+                cuenta.debe = datos.get('cuentaCapitalD', 0)
+            if cuenta.nombre == 'Capital no invertido':
+                cuenta.haber += datos.get('noReinvertido', 0)
+            cuenta.save()
+        return JsonResponse({'status': 'success'}, status=200)
+    
+def consultarEstadosFinancieros(request, numPeriodo):
+    periodo = Periodo.objects.get(numero=numPeriodo)
+    cuentas = CuentaPeriodica.objects.filter(periodo = periodo)
+    periodos = Periodo.objects.all()
+    return render(request, 'estadosFinancieros.html', {'cuentas': cuentas, 'periodos': periodos, 'consulta':True, 'period':periodo})
+
+def nuevo_periodo():
+    try:
+        ultimoPeriodo = Periodo.objects.latest('numero')
+        numeroPeriodo = ultimoPeriodo.numero + 1
+    except Periodo.DoesNotExist:
+        numeroPeriodo = 1
+        ultimoPeriodo = None  
+    if ultimoPeriodo != None:
+        ultimoPeriodo.fecha_fin = date.today()
+    fechaInicio = date.today()
+    periodo = Periodo(numero = numeroPeriodo, fecha_inicio = fechaInicio)
+    periodo.save()
+    return periodo
