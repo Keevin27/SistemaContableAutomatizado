@@ -20,7 +20,7 @@ class Transaccion(models.Model):
     montoHaber = models.DecimalField(max_digits=10, decimal_places=2)
 
 class Empleado(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, default='')
     nominal = models.DecimalField(max_digits=10, decimal_places=2)
     salario = models.DecimalField(max_digits=10, decimal_places=2)
     puesto = models.CharField(max_length=100)
@@ -30,15 +30,38 @@ class Empleado(models.Model):
     afp = models.DecimalField(max_digits=10, decimal_places=2)
     insaforp = models.DecimalField(max_digits=10, decimal_places=2)
     costo = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     aguinaldo = models.DecimalField(max_digits=10, decimal_places=2)
     anios = models.IntegerField(default=1)
+    factor_recargo = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    factor_recargo_con_eficiencia = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
     def __str__(self):
         return self.nombre
 
 class OrdenDeDesarrollo(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
+    mod = models.DecimalField(max_digits=10, decimal_places=2)
+    moi = models.DecimalField(max_digits=10, decimal_places=2)
+    moh = models.DecimalField(max_digits=10, decimal_places=2)
+    cif = models.DecimalField(max_digits=10, decimal_places=2)
+    total_cif = models.DecimalField(max_digits=10, decimal_places=2)
+    tasa_cif = models.DecimalField(max_digits=10, decimal_places=2)
+    total_loc = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_por_linea = models.DecimalField(max_digits=10, decimal_places=2)
+    lineas_mes = models.DecimalField(max_digits=10, decimal_places=2)
+    tiempo_estimado = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_producto = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+
+class Modulo(models.Model):
+    orden_desarrollo = models.ForeignKey(OrdenDeDesarrollo, on_delete=models.CASCADE, null= True)
+    nombre_modulo = models.CharField(max_length=100, default='')
+    descripcion = models.CharField(max_length=100, default='')
+    optimista = models.IntegerField()
+    probable = models.IntegerField()
+    pesimista = models.IntegerField()
+    lineas_esperadas = models.IntegerField()
+    costo_modulo = models.DecimalField(max_digits=10, decimal_places=2)
 
 class Asignacion(models.Model):
     empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
