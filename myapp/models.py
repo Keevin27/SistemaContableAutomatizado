@@ -84,4 +84,3 @@ class Asignacion(models.Model):
     orden = models.ForeignKey(OrdenDeDesarrollo, on_delete=models.CASCADE)
     fecha_asignacion = models.DateField(auto_now_add=True)
     estado = models.CharField(max_length=50, choices=[('pendiente', 'Pendiente'), ('en_progreso', 'En Progreso'), ('completado', 'Completado')])
-
