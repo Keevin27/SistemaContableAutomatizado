@@ -66,7 +66,7 @@
                 <div><h5>Estimaciones</h5></div>
                 <label for="lineas_mes">Lineas de Codigo al Mes:</label>
                 <input type="number" name="lineas_mes" class="form-control" placeholder="1" step="1" min="1" max="" required="" id="lineas_mes" value="" oninput="calcularCostos()">
-                <h6>Tiempo estimado: </h6><p id="tiempo_estimado"></p>  
+                <h6>Tiempo estimado: </h6><p><p id="tiempo_estimado"></p> meses</p>  
                 <h6>Costo del producto: </h6><p id="costo_producto"></p>
                 <h6>Precio de venta: </h6><p id="precio_venta"></p>
             </div>
@@ -189,15 +189,15 @@
             const node_tasa_cif = document.getElementById('tasa_cif');
             const node_total_cif = document.getElementById('total_cif');
             const mo_horas = document.getElementById('mo_horas');
-            const total_loc = document.getElementById('total_loc');
-            const csrfToken = "{% csrf_token %}";
+            const total_loc = document.getElementById('total_loc')
+
             const datos = [];
 
             datos.push({mod: mo_directa.innerText, moi: mo_indirecta.innerText
                 , moh: mo_horas.innerText, cif: mo_cif.innerText
                 , total_cif: node_total_cif.innerText, tasa_cif: node_tasa_cif.innerText
                 , total_loc: total_loc.innerText, costo_por_linea: costo_por_linea.innerText
-                , lineas_mes: lineas_mes.innerText, tiempo_estimado: tiempo_estimado.innerText
+                , lineas_mes: lineas_mes.value || 1, tiempo_estimado: tiempo_estimado.innerText
                 , costo_producto: costo_estimado.innerText, precio_venta: precio_venta.innerText
             });
 
@@ -215,12 +215,10 @@
                 datos.push(fila);
             }
 
-            alert(csrfToken);
-
             $.ajax({
                 url: "{% url 'control_de_costos' %}",
                 type: 'POST',
-                data: JSON.stringify({csrfmiddlewaretoken: csrfToken, datos: datos}),
+                data: JSON.stringify(datos),
                 contentType: 'application/json',
                 success: function(response) {
                     alert('Datos enviados exitosamente');
@@ -268,7 +266,7 @@
             costo_producto = totalLOC * precio_por_LOC;
             precio_venta = costo_producto + costo_producto * 0.3;
             costo_estimado.innerText = costo_producto.toFixed(2);
-            tiempo_estimado.innerText = tiempo.toFixed(2).toString() + " meses";
+            tiempo_estimado.innerText = tiempo.toFixed(2).toString();
             precio_estimado.innerText = precio_venta.toFixed(2);
             
             const asignaciones = document.getElementById('asignaciones');

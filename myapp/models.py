@@ -40,18 +40,18 @@ class Empleado(models.Model):
         return self.nombre
 
 class OrdenDeDesarrollo(models.Model):
-    mod = models.DecimalField(max_digits=10, decimal_places=2)
-    moi = models.DecimalField(max_digits=10, decimal_places=2)
-    moh = models.DecimalField(max_digits=10, decimal_places=2)
-    cif = models.DecimalField(max_digits=10, decimal_places=2)
-    total_cif = models.DecimalField(max_digits=10, decimal_places=2)
-    tasa_cif = models.DecimalField(max_digits=10, decimal_places=2)
-    total_loc = models.DecimalField(max_digits=10, decimal_places=2)
-    costo_por_linea = models.DecimalField(max_digits=10, decimal_places=2)
-    lineas_mes = models.DecimalField(max_digits=10, decimal_places=2)
-    tiempo_estimado = models.DecimalField(max_digits=10, decimal_places=2)
-    costo_producto = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    mod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    moi = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    moh = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    cif = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_cif = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tasa_cif = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_loc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    costo_por_linea = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    lineas_mes = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tiempo_estimado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    costo_producto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 class Modulo(models.Model):
     orden_desarrollo = models.ForeignKey(OrdenDeDesarrollo, on_delete=models.CASCADE, null= True)
