@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Cuenta</title>
+    <link rel="stylesheet" type="text/css" href='{% static "agregarCuenta.css" %}'>
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Agregar Cuenta</h1>
+        {{error}}
+        <form id="formulario" method = "POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre">
+                </div>
+                <div class="col">
+                    <label for="clasificacion">Clasificacion:</label>
+                    <select id="clasificacion" name="clasificacion" required>
+                        <option value="">Seleccione...</option>
+                        <option value="Activo corriente">Activo - corriente</option>
+                        <option value="Activo no corriente">Activo - no corriente</option>
+                        <option value="Pasivo corriente">Pasivo - corriente</option>
+                        <option value="Pasivo no corriente">Pasivo - no corriente</option>
+                        <option value="Patrimonio">Patrimonio</option>
+                        <option value="Gastos">Gastos</option>
+                        <option value="Ingresos">Ingresos</option>
+                    </select>
+                    
+                </div>
+                <div class="col">
+                    <button type="submit">Agregar</button>
+                    <button type="button" onclick="confirmarCancelar()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+<script>
+    function confirmarCancelar() {
+        window.location.href = "{% url 'catalogodecuentas' %}";
+    }
+</script>
+{% endblock %}

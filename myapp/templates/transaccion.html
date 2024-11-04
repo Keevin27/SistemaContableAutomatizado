@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,16 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transacciones</title>
     <style>
+        
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
         .container {
-            width: 800px;
+            width: 1000px;
             margin: 0 auto;
+            padding: 0;
         }
         h2 {
             text-align: center;
+            margin-bottom: 20px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -40,6 +48,12 @@
             width: 30%;
             padding: 8px;
             box-sizing: border-box;
+        }
+        .table-container {
+            max-height: 300px; /* Altura máxima para el contenedor de la tabla */
+            overflow-y: auto; /* Habilita el scroll vertical */
+            border: 1px solid #ddd; /* Borde opcional */
+            margin-top: 20px; /* Margen superior para separación */
         }
         table {
             width: 100%;
@@ -76,23 +90,28 @@
     </style>
 </head>
 <body>
+    
     <div class="container">
         <h2>Transacciones</h2>
+        <form id="formulario" method = "POST">
+            {% csrf_token %}
         <div class="form-group">
             <label for="cuentaCargar">Cuenta a cargar:</label>
-            <select  id="cuentaCargar" required>
-                <!--agregar jinja para desplegar las cuentas-->
+            <select  id="cuentaCargar" name="cuentaCargar" required>
+                {% for cuenta in cuentas %}
+                <option value="{{ cuenta.nombre }}">{{ cuenta.nombre }}</option>
+                {% endfor %}
             </select>
             <label for="montoCargar">Monto:</label>
             <input type="number" id="montoCargar" name="montoCargar" placeholder="0.00" required>
         </div>
         <div class="form-group">
             <label for="cuentaAbonar">Cuenta a Abonar:</label>
-            <select  id="cuentaAbonar" required>
-                <!--agregar jinja para desplegar las cuentas-->
+            <select  id="cuentaAbonar" name="cuentaAbonar" required>
+                {% for cuenta in cuentas %}
+                <option value="{{ cuenta.nombre}}">{{ cuenta.nombre }}</option>
+                {% endfor %}
             </select>
-            <label for="montoAbonar">Monto:</label>
-            <input type="number" id="montoAbonar" name="montoAbonar" placeholder="0.00" required>
         </div>
         <div class="form-group">
             <label for="agregarIVA">Aplicar IVA</label>
@@ -100,68 +119,45 @@
         </div>
         <div class="form-group">
             <label for="descripcion">Descripción</label>
-            <input type="text" id="descripcion" placeholder="ingrese una descripcion" required>
-            <button id="agregar-btn">Agregar</button>
+            <input type="text" id="descripcion" name="descripcion" placeholder="ingrese una descripcion" required>
+            <button id="agregar-btn" type="submit" >Agregar</button>
+            
+            
         </div>
-
+        </form>
+        <div class="table-container">
         <table>
             <thead>
                 <tr>
                     <th>Fecha</th>
                     <th>Código</th>
-                    <th>Cuenta</th>
-                    <th>Descripción</th>
+                    <th>Cuenta a Cargar</th>
                     <th>Movimientos Debe</th>
+                    <th>Descripción</th>
+                    <th>cuenta a Abonar</th>
                     <th>Movimientos Haber</th>
                 </tr>
             </thead>
             <tbody id="transacciones-body">
-                
+                {% for transaccion in transacciones %}
+                <tr>
+                    <td>{{ transaccion.fecha }}</td>
+                    <td>{{ transaccion.codigo }}</td>
+                    <td>{{ transaccion.debe }}</td>
+                    <td>{{ transaccion.montoDebe }}</td>
+                    <td>{{ transaccion.descripcion }}</td>
+                    <td>{{ transaccion.haber }}</td>
+                    <td>{{ transaccion.montoHaber }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
+        </div>
         <div class="total">
-            <span class="total-amount">Total Debe: $<span id="totalDebe">0.00</span></span> 
-            <span class="total-amount">Total Haber: $<span id="totalHaber">0.00</span></span>
+            <span class="total-amount">Total Debe: $<span id="totalDebe">{{ total_debe|floatformat:2 }}</span></span> 
+            <span class="total-amount">Total Haber: $<span id="totalHaber">{{ total_haber|floatformat:2 }}</span></span>
         </div>
     </div>
-
-    <script>
-        let totalDebe = 0;
-        let totalHaber = 0;
-
-        document.getElementById("agregar-btn").addEventListener("click", function () {
-            const codigoCuenta = document.getElementById("codigoCuenta").value;
-            const descripcion = document.getElementById("descripcion").value;
-            const debe = parseFloat(document.getElementById("debe").value) || 0;
-            const haber = parseFloat(document.getElementById("haber").value) || 0;
-            const fecha = new Date().toLocaleDateString();
-
-            if (!codigoCuenta || (!debe && !haber)) {
-                alert("Por favor ingrese un código de cuenta y al menos un movimiento.");
-                return;
-            }
-
-            // Agregar fila a la tabla
-            const tableBody = document.getElementById("transacciones-body");
-            const row = tableBody.insertRow();
-            row.insertCell(0).textContent = fecha;
-            row.insertCell(1).textContent = codigoCuenta;
-            row.insertCell(2).textContent = descripcion;
-            row.insertCell(3).textContent = debe.toFixed(2);
-            row.insertCell(4).textContent = haber.toFixed(2);
-
-            // Actualizar totales
-            totalDebe += debe;
-            totalHaber += haber;
-            document.getElementById("totalDebe").textContent = totalDebe.toFixed(2);
-            document.getElementById("totalHaber").textContent = totalHaber.toFixed(2);
-
-            // Limpiar los campos
-            document.getElementById("codigoCuenta").value = '';
-            document.getElementById("descripcion").value = '';
-            document.getElementById("debe").value = '';
-            document.getElementById("haber").value = '';
-        });
-    </script>
 </body>
 </html>
+{% endblock %}

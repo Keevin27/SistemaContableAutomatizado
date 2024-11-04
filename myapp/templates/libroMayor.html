@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transacciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .table-container {
+            max-height: 400px; /* Tamaño de la tabla con scroll */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        #agregar-btn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #B11C19;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 20%;
+        }
+        #agregar-btn:hover {
+            background-color: #45a049;
+        }
+        .table-container {
+            max-height: 300px; /* Altura máxima para el contenedor de la tabla */
+            overflow-y: auto; /* Habilita el scroll vertical */
+            border: 1px solid #ddd; /* Borde opcional */
+            margin-top: 20px; /* Margen superior para separación */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Libro Mayor</h2>
+        <form id="formulario" method = "POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="cuentaRevisar">Seleccione la cuenta para ver su estado financiero :</label>
+                <select  id="cuentaRevisar" name="cuentaRevisar" required>
+                    <option value="">-- Seleccione una cuenta --</option>
+                    {% for cuenta in cuentas %}
+                    <option value="{{ cuenta.nombre }}">{{ cuenta.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="agregar-btn" type="submit">Ver Transacciones</button>
+        </form>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha de Operacion</th>
+                        <th>Descripción de Operacion</th>
+                        <th>Movimientos Debe</th>
+                        <th>Movimientos Haber</th>
+                    </tr>
+                </thead>
+                <tbody id="operaciones-cuenta">
+                    {% for transaccion in transacciones %}
+                    <tr>
+                        <td>{{ transaccion.fecha }}</td>
+                        <td>{{ transaccion.descripcion }}</td>
+                        {% if transaccion.tipo == 'debe' %}
+                        <td>{{ transaccion.montoDebe }}</td>
+                        <td></td>  <!-- Campo vacío para "haber" -->
+                        {% elif transaccion.tipo == 'haber' %}
+                        <td></td>  <!-- Campo vacío para "debe" -->
+                        <td>{{ transaccion.montoHaber }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

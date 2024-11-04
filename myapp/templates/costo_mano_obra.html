@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Agregar Empleado</title>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <h1>Agregar Empleado</h1>
+            <form method="post" class="form-inline">
+                <div class="form-group mb-2">
+                    {% csrf_token %}
+                    {{ form }}
+                    <button type="submit" class="btn btn-primary ml-3 mt-1">Guardar</button>
+                </div>
+            </form>
+        </div>
+        <div class="table-responsive p-3 mb-3">
+            <h1>Lista de Empleados - Costo Semanal</h1>
+            <form method="post" action="costo_mano_obra/eliminar_empleado">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Select</th>
+                            <th scope="col" id="nombre">Nombre</th>
+                            <th scope="col" id="salario">Salario</th>
+                            <th scope="col" id="puesto">Puesto</th>
+                            <th scope="col" id="vacaciones">Vacaciones</th>
+                            <th scope="col" id="septimo">Séptimo</th>
+                            <th scope="col" id="isss">ISSS</th>
+                            <th scope="col" id="afp">AFP</th>
+                            <th scope="col" id="insaforp">INSAFORP</th>
+                            <th scope="col" id="costo">Costo</th>
+                            <th scope="col" id="aguinaldo">Aguinaldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for empleado in empleados %}
+                        <tr>
+                            <td><input type="radio" name="id" value="{{ empleado.id }}"></td>
+                            <td>{{ empleado.nombre }}</td>
+                            <td>{{ empleado.salario }}</td>
+                            <td>{{ empleado.puesto }}</td>
+                            <td>{{ empleado.vacaciones }}</td>
+                            <td>{{ empleado.septimo }}</td>
+                            <td>{{ empleado.isss }}</td>
+                            <td>{{ empleado.afp }}</td>
+                            <td>{{ empleado.insaforp }}</td>
+                            <td>{{ empleado.costo }}</td>
+                            <td>{{ empleado.aguinaldo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div> 
+    </body>
+</html>
+{% endblock %}
