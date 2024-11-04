@@ -360,13 +360,12 @@ def transacciones(request):
         iva = request.POST.get('agregarIVA','off')
         montoHaber=montoCargar
 
-        ultima_transaccion = Transaccion.objects.latest('codigo')
-        ultimo_codigo=ultima_transaccion.codigo
-        # Verifica si existe un código y convierte a entero
-        if ultimo_codigo is not None:
-            nuevo_codigo = int(ultimo_codigo) + 1 # Incrementa el código y convierte a cadena
-        else:
-            nuevo_codigo = '1'  # Comienza desde 1 como cadena
+        try:
+            ultima_transaccion = Transaccion.objects.latest('codigo')
+            ultimo_codigo=ultima_transaccion.codigo
+            nuevo_codigo = int(ultimo_codigo) + 1
+        except:
+            nuevo_codigo = '1'
 
         cuenta_cargar = Cuenta.objects.get(nombre=cuentaCargarID)
         cuenta_abonar = Cuenta.objects.get(nombre=cuentaAbonarID)
