@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estados Financieros</title>
+    <link rel="stylesheet" type="text/css" href='{% static "estadosFinancieros.css" %}'>
+</head>
+<body>
+    <header>
+        <h1>Estados Financieros</h1>
+    </header>
+    <main>
+        <div id="periodos-container" class="horizontal-buttons">
+            {% if consulta %}
+            <form action="/estados_financieros">
+                <button class="botonDePeriodo">Actual</button>
+            </form>
+            {% endif %}
+            {% for periodo in periodos %}
+            <form action="/estados_financieros/{{ periodo.numero }}">
+                <button class="botonDePeriodo">{{ periodo.numero }}</button>
+            </form>
+            {% endfor %}
+        </div>
+        {% if consulta %}
+        <div class="div1">Periodo {{ period.numero }}</div>
+        {% else %}
+        <div class="div1"><button id="cierre-btn">Realizar Cierre Contable</button></div>
+        {% endif %}
+        <div class="contenedor">
+            <table id="registros-table">
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Cuenta</th>
+                        <th colspan="2">Balance de comprobacion</th>
+                        <th colspan="2">Ajustes</th>
+                        <th colspan="2">Balance de comprobacion ajustado</th>
+                        <th colspan="3">Estado de resultados</th>
+                        <th colspan="3">Estado de capital</th>
+                        <th colspan="2">Balance general</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuenta in cuentas %}
+                    <tr data-id="{{ cuenta.codigo }}">
+                        <td>{{ cuenta.codigo }}</td>
+                        <td>{{ cuenta.nombre }}</td>
+                        <td><input type="text" class="debe" readonly value="{{ cuenta.debe }}"></td>
+                        <td><input type="text" class="haber" readonly value="{{ cuenta.haber }}"></td>
+                        <td><input type="number" min="0.00" onkeydown="return event.key !== '-'" name="ajusteDebe" {% if consulta %} value = {{ cuenta.ajusteDebe }} readonly {% endif %} placeholder="0.00"></td>
+                        <td><input type="number" min="0.00" onkeydown="return event.key !== '-'" name="ajusteHaber" {% if consulta %} value = {{ cuenta.ajusteHaber }} readonly {% endif %} placeholder="0.00"></td>
+                        <td><input type="text" class="BCADebe" readonly></td>
+                        <td><input type="text" class="BCAHaber" readonly></td>
+                        <td><input type="text" class="resultadoDebe" readonly></td>
+                        <td><input type="text" class="resultadoHaber" readonly></td>
+                        <td><input type="checkbox" class="checkEstadoResultado" {% if consulta %} {% if cuenta.estadoResultado %} checked disabled {% else %} disabled {% endif %} {% endif %} data-id="{{ cuenta.codigo }}"></td>
+                        <td><input type="text" class="capitalDebe" readonly></td>
+                        <td><input type="text" class="capitalHaber" readonly></td>
+                        <td><input type="checkbox" class="checkEstadoCapital" data-id="{{ cuenta.codigo }}"  {% if consulta %} {% if cuenta.estadoCapital %} checked disabled {% else %} disabled {% endif %} {% endif %}></td>
+                        <td><input type="text" class="generalDebe" readonly></td>
+                        <td><input type="text" class="generalHaber" readonly></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td><td>Utilidad del periodo</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><input type="text" class="resultadoEjercicioDebe" readonly></td>
+                        <td><input type="text" class="resultadoEjercicioHaber" readonly></td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Utilidad a invertir</td><td></td><td></td><td> </td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><input type="number" class="utilidadInvertir" {% if consulta %} value = {{ period.aReinvertir }} readonly {% else %} placeholder="0.00" {% endif %}></td>
+                    </tr>
+                    <tr>
+                        <td></td><td>Nuevo estado de capital</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><input type="text" class="nuevoCapitalDebe" readonly></td>
+                        <td><input type="text" class="nuevoCapitalHaber" readonly></td><td></td>
+                        <td><input type="text" class="nuevoCapitalDebe2" readonly></td>
+                        <td><input type="text" class="nuevoCapitalHaber2" readonly></td>
+                    </tr>
+                    <tr>
+                        <td></td><td>No invertido (Periodo)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                        <td><input type="text" class="noInvertido" readonly></td><td></td><td></td>
+                        <td><input type="text" class="noInvertido2" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>---</th>
+                        <th>Total</th>
+                        <th><input type="text" id="totalBCdebe" readonly></th>
+                        <th><input type="text" id="totalBChaber" readonly></th>
+                        <th><input type="text" id="totalAdebe" readonly></th>
+                        <th><input type="text" id="totalAhaber" readonly></th>
+                        <th><input type="text" id="totalBCAdebe" readonly></th>
+                        <th><input type="text" id="totalBCAhaber" readonly></th>
+                        <th><input type="text" id="totalERdebe" readonly></th>
+                        <th><input type="text" id="totalERhaber" readonly></th>
+                        <th></th>
+                        <th><input type="text" id="totalECdebe" readonly></th>
+                        <th><input type="text" id="totalEChaber" readonly></th>
+                        <th></th>
+                        <th><input type="text" id="totalBGdebe" readonly></th>
+                        <th><input type="text" id="totalBGhaber" readonly></th>
+                    </tr>
+                </tbody>
+            </table>      
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Sistema Contable</p>
+    </footer>
+</body>
+</html>
+<script>
+    function generarBalanceComAjustado(fila) {
+        // Obtener los valores directamente del contenido del <td>
+        let debe = parseFloat(fila.querySelector('.debe').value) || 0;
+        let haber = parseFloat(fila.querySelector('.haber').value) || 0;
+        let ajusteDebe = parseFloat(fila.querySelector('input[name="ajusteDebe"]').value) || 0;
+        let ajusteHaber = parseFloat(fila.querySelector('input[name="ajusteHaber"]').value) || 0;
+        let sumaDebe = debe + ajusteDebe;
+        let sumaHaber = haber + ajusteHaber;
+        const checkboxResultado = fila.querySelector('.checkEstadoResultado');
+        const checkboxCapital = fila.querySelector('.checkEstadoCapital');
+        // Mostrar el resultado en la última celda
+        //fila.querySelector('.BCADebe').value = sumaDebe.toFixed(2);
+        //fila.querySelector('.BCAHaber').value = sumaHaber.toFixed(2);
+        if (sumaDebe > sumaHaber) {
+            sumaDebe = sumaDebe - sumaHaber;
+            fila.querySelector('.BCADebe').value = sumaDebe.toFixed(2);
+            fila.querySelector('.BCAHaber').value = '';
+            if (checkboxResultado.checked) {
+                fila.querySelector('.resultadoDebe').value = sumaDebe.toFixed(2);
+                fila.querySelector('.resultadoHaber').value = '';
+            } 
+            if (checkboxCapital.checked) {
+                fila.querySelector('.capitalDebe').value = sumaDebe.toFixed(2);
+                fila.querySelector('.capitalHaber').value = '';
+            }
+            if (!checkboxResultado.checked && !checkboxCapital.checked) {
+                fila.querySelector('.generalDebe').value = sumaDebe.toFixed(2);
+                fila.querySelector('.generalHaber').value = '';
+            }
+        } else if (sumaDebe < sumaHaber){
+            sumaHaber = sumaHaber - sumaDebe;
+            fila.querySelector('.BCADebe').value = '';
+            fila.querySelector('.BCAHaber').value = sumaHaber.toFixed(2);
+            if (checkboxResultado.checked) {
+                fila.querySelector('.resultadoDebe').value = '';
+                fila.querySelector('.resultadoHaber').value = sumaHaber.toFixed(2);
+            } 
+            if (checkboxCapital.checked) {
+                fila.querySelector('.capitalDebe').value = '';
+                fila.querySelector('.capitalHaber').value = sumaHaber.toFixed(2);
+            }
+            if (!checkboxResultado.checked && !checkboxCapital.checked) {
+                fila.querySelector('.generalHaber').value = sumaHaber.toFixed(2);
+                fila.querySelector('.generalDebe').value = '';
+            }
+        } else {
+            fila.querySelector('.BCADebe').value = '';
+            fila.querySelector('.BCAHaber').value = '';
+            fila.querySelector('.generalDebe').value = '';
+            fila.querySelector('.generalHaber').value = '';
+        
+            if (checkboxResultado.checked) {
+                fila.querySelector('.resultadoDebe').value = '';
+                fila.querySelector('.resultadoHaber').value = ''; 
+            }
+            if (checkboxCapital.checked) {
+                fila.querySelector('.capitalDebe').value = '';
+                fila.querySelector('.capitalHaber').value = '';
+            }
+        }
+        actualizarTotales();
+    }
+    function actualizarTotales() {
+        let totalDebe = 0;
+        let totalHaber = 0;
+        let totalDebeAjustes = 0;
+        let totalHaberAjustes = 0;
+        let totalDebeBCAjustado = 0;
+        let totalHaberBCAjustado = 0;
+        let totalDebeER = 0;
+        let totalHaberER = 0;
+        let totalDebeEC = 0;
+        let totalHaberEC = 0;
+        let totalDebeBG = 0;
+        let totalHaberBG = 0;
+
+        // Seleccionar todas las celdas de balance ajustado (BCADebe y BCAHaber)
+        document.querySelectorAll('.debe').forEach(celda => {
+            totalDebe += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.haber').forEach(celda => {
+            totalHaber += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('input[name="ajusteDebe"]').forEach(celda => {
+            totalDebeAjustes+= parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('input[name="ajusteHaber"]').forEach(celda => {
+            totalHaberAjustes += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.BCADebe').forEach(celda => {
+            totalDebeBCAjustado += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.BCAHaber').forEach(celda => {
+            totalHaberBCAjustado += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.resultadoDebe').forEach(celda => {
+            totalDebeER += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.resultadoHaber').forEach(celda => {
+            totalHaberER += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.capitalDebe').forEach(celda => {
+            totalDebeEC += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.capitalHaber').forEach(celda => {
+            totalHaberEC += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.generalDebe').forEach(celda => {
+            totalDebeBG += parseFloat(celda.value) || 0;
+        });
+        document.querySelectorAll('.generalHaber').forEach(celda => {
+            totalHaberBG += parseFloat(celda.value) || 0;
+        });
+        // Mostrar los totales en los elementos correspondientes
+        document.getElementById('totalBCdebe').value = totalDebe.toFixed(2);
+        document.getElementById('totalBChaber').value = totalHaber.toFixed(2);
+        document.getElementById('totalAdebe').value = totalDebeAjustes.toFixed(2);
+        document.getElementById('totalAhaber').value = totalHaberAjustes.toFixed(2);
+        document.getElementById('totalBCAdebe').value = totalDebeBCAjustado.toFixed(2);
+        document.getElementById('totalBCAhaber').value = totalHaberBCAjustado.toFixed(2);
+        document.getElementById('totalERdebe').value = totalDebeER.toFixed(2);
+        document.getElementById('totalERhaber').value = totalHaberER.toFixed(2);
+        document.getElementById('totalECdebe').value = totalDebeEC.toFixed(2);
+        document.getElementById('totalEChaber').value = totalHaberEC.toFixed(2);
+        document.getElementById('totalBGdebe').value = totalDebeBG.toFixed(2);
+        document.getElementById('totalBGhaber').value = totalHaberBG.toFixed(2);
+        calcularCierre();
+        setInvertir();
+    }
+    function calcularCierre(){
+        let ERhaber = parseFloat(document.getElementById('totalERhaber').value) || 0;
+        let ERdebe = parseFloat(document.getElementById('totalERdebe').value) || 0;
+        let resultadoEjercicio = 0;
+        resultadoEjercicio = ERhaber - ERdebe;
+        if (resultadoEjercicio > 0){
+            document.querySelector('.resultadoEjercicioHaber').value = resultadoEjercicio.toFixed(2);
+            document.querySelector('.resultadoEjercicioDebe').value = '';
+        }else{
+            resultadoEjercicio = ERdebe - ERhaber;
+            document.querySelector('.resultadoEjercicioDebe').value = resultadoEjercicio.toFixed(2);
+            document.querySelector('.resultadoEjercicioHaber').value = '';
+        }
+    }
+    function setInvertir() {
+        let aInvertir = parseFloat(document.querySelector('.utilidadInvertir').value) || 0;
+        let EChaber = parseFloat(document.getElementById('totalEChaber').value) || 0;
+        let ECdebe = parseFloat(document.getElementById('totalECdebe').value) || 0;
+        let noInvertidoInput = parseFloat(document.querySelector('.noInvertido').value) || 0;    
+        let resultadoEjercicioHaber = parseFloat(document.querySelector('.resultadoEjercicioHaber').value) || 0;
+        let resultadoEjercicioDebe = parseFloat(document.querySelector('.resultadoEjercicioDebe').value) || 0;
+
+        let totalHaberEC = 0;
+        document.querySelectorAll('.capitalHaber').forEach(celda => {
+            totalHaberEC += parseFloat(celda.value) || 0;
+        });
+        let nuevoEChaber= totalHaberEC + aInvertir;
+        document.getElementById('totalEChaber').value = nuevoEChaber.toFixed(2);
+
+        let nuevoCapital = nuevoEChaber - ECdebe;
+        if(nuevoCapital > 0){
+            document.querySelector('.nuevoCapitalHaber').value = nuevoCapital.toFixed(2);
+            document.querySelector('.nuevoCapitalHaber2').value = nuevoCapital.toFixed(2);
+            document.querySelector('.nuevoCapitalDebe').value = '';
+            document.querySelector('.nuevoCapitalDebe2').value = '';
+        }else{
+            nuevoCapital = ECdebe - nuevoEChaber;
+            document.querySelector('.nuevoCapitalDebe').value = nuevoCapital.toFixed(2);
+            document.querySelector('.nuevoCapitalDebe2').value = nuevoCapital.toFixed(2);
+            document.querySelector('.nuevoCapitalHaber').value = '';
+            document.querySelector('.nuevoCapitalHaber2').value = '';
+        }
+        nuevoEChaber= totalHaberEC + aInvertir;
+        nuevoCapital = nuevoEChaber - ECdebe;
+        let noInvertido = resultadoEjercicioHaber - aInvertir;
+        document.querySelector('.noInvertido').value = noInvertido.toFixed(2);
+        document.querySelector('.noInvertido2').value = noInvertido.toFixed(2);
+        if(nuevoCapital > 0){
+            let BGhaber = 0;
+            document.querySelectorAll('.generalHaber').forEach(celda => {
+                BGhaber += parseFloat(celda.value) || 0;
+            });
+            let nuevoBGhaber = BGhaber + noInvertido + nuevoCapital;
+            document.getElementById('totalBGhaber').value = nuevoBGhaber.toFixed(2);
+        }else{
+            nuevoCapital = ECdebe - nuevoEChaber;
+            let BGdebe = 0;
+            document.querySelectorAll('.generalDebe').forEach(celda => {
+                BGdebe += parseFloat(celda.value) || 0;
+            });
+            let nuevoBGdebe = BGdebe + nuevoCapital;
+            document.getElementById('totalBGdebe').value = nuevoBGdebe.toFixed(2);
+        }
+    }
+    function init() {
+            const filas = document.querySelectorAll('tbody tr[data-id]');
+            filas.forEach(fila => {
+                const debeInput = fila.querySelector('input[name="ajusteDebe"]');
+                const haberInput = fila.querySelector('input[name="ajusteHaber"]');
+
+                let debe = fila.querySelector('.debe').value || 0;
+                let haber = fila.querySelector('.haber').value || 0 ;
+                if (debe > haber){
+                    let resultado = debe - haber;
+                    fila.querySelector('.debe').value = resultado.toFixed(2);
+                    fila.querySelector('.haber').value = '';
+                }else if (haber > debe){
+                    let result = haber - debe;
+                    fila.querySelector('.debe').value = '';
+                    fila.querySelector('.haber').value = result.toFixed(2);
+                }else{
+                    fila.querySelector('.debe').value = '';
+                    fila.querySelector('.haber').value = '';
+                }
+
+                // Añadir eventos de entrada para actualizar la suma en tiempo real
+                debeInput.addEventListener('input', () => generarBalanceComAjustado(fila));
+                haberInput.addEventListener('input', () => generarBalanceComAjustado(fila));
+
+                // Calcular la suma inicial
+                generarBalanceComAjustado(fila);
+                
+            });
+            const utilidadInvertirInput = document.querySelector('.utilidadInvertir');
+            utilidadInvertirInput.addEventListener('input', () => setInvertir());
+        }
+    document.addEventListener('DOMContentLoaded', init);
+    document.querySelectorAll('.checkEstadoResultado').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const fila = this.closest('tr'); // Obtiene la fila en la que está el checkbox
+            const bcaDebe = fila.querySelector('.BCADebe').value; // Valor de BCADebe
+            let resultadoDebe = fila.querySelector('.resultadoDebe'); // Campo resultadoDebe
+            const bcaHaber = fila.querySelector('.BCAHaber').value;
+            let resultadoHaber = fila.querySelector('.resultadoHaber'); 
+            let generalDebe = fila.querySelector('.generalDebe'); 
+            let generalHaber = fila.querySelector('.generalHaber'); 
+            let capitalDebe = fila.querySelector('.capitalDebe'); 
+            let capitalHaber = fila.querySelector('.capitalHaber'); 
+            const checkboxCapital = fila.querySelector('.checkEstadoCapital');
+
+            if (this.checked) {
+                resultadoDebe.value = bcaDebe; // Copiar valor si está seleccionado
+                resultadoHaber.value = bcaHaber;
+                generalDebe.value = '';
+                generalHaber.value = '';
+                checkboxCapital.checked = false;
+                capitalDebe.value = '';
+                capitalHaber.value = '';
+            } else {
+                resultadoDebe.value = ''; // Limpiar valor si se desmarca
+                resultadoHaber.value='';
+            }
+            if (!this.checked && !checkboxCapital.checked) {
+                generalDebe.value = bcaDebe;
+                generalHaber.value = bcaHaber;
+            }
+            actualizarTotales();
+            
+        });
+    });
+    document.querySelectorAll('.checkEstadoCapital').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const fila = this.closest('tr'); // Obtiene la fila en la que está el checkbox
+            const bcaDebe = fila.querySelector('.BCADebe').value; // Valor de BCADebe
+            let capitalDebe = fila.querySelector('.capitalDebe'); // Campo resultadoDebe
+            const bcaHaber = fila.querySelector('.BCAHaber').value;
+            let capitalHaber = fila.querySelector('.capitalHaber'); 
+            let generalDebe = fila.querySelector('.generalDebe'); 
+            let generalHaber = fila.querySelector('.generalHaber'); 
+            let resultadoDebe = fila.querySelector('.resultadoDebe'); 
+            let resultadoHaber = fila.querySelector('.resultadoHaber');
+            const checkboxResultado = fila.querySelector('.checkEstadoResultado')
+
+            if (this.checked) {
+                capitalDebe.value = bcaDebe; // Copiar valor si está seleccionado
+                capitalHaber.value = bcaHaber;
+                generalDebe.value = '';
+                generalHaber.value = '';
+                checkboxResultado.checked = false;
+                resultadoDebe.value = '';
+                resultadoHaber.value = '';
+            } else {
+                capitalDebe.value = ''; // Limpiar valor si se desmarca
+                capitalHaber.value='';
+            }
+            if (!this.checked && !checkboxResultado.checked) {
+                generalDebe.value = bcaDebe;
+                generalHaber.value = bcaHaber;
+            }
+            actualizarTotales();
+        });
+    });
+    
+    document.getElementById('cierre-btn').addEventListener('click', function() {
+    const filas = document.querySelectorAll('tbody tr[data-id]');
+    const cuentas = [];
+    const aInvertir = parseFloat(document.querySelector('.utilidadInvertir').value) || 0;
+    const noInvertido = parseFloat(document.querySelector('.noInvertido').value) || 0;
+    const cuentaCapitalDebe = parseFloat(document.querySelector('.nuevoCapitalDebe').value) || 0;
+    const cuentaCapitalHaber = parseFloat(document.querySelector('.nuevoCapitalHaber').value) || 0;
+
+    // Recorre cada fila y obtiene los valores de las celdas y checkboxes
+    filas.forEach(fila => {
+        const cuentaData = {
+            id: fila.getAttribute('data-id'),
+            debe: parseFloat(fila.querySelector('.debe').value) || 0,
+            haber: parseFloat(fila.querySelector('.haber').value) || 0,
+            ajusteDebe: parseFloat(fila.querySelector('input[name="ajusteDebe"]').value) || 0,
+            ajusteHaber: parseFloat(fila.querySelector('input[name="ajusteHaber"]').value) || 0,
+            BCADebe: parseFloat(fila.querySelector('.BCADebe').value) || 0,
+            BCAHaber: parseFloat(fila.querySelector('.BCAHaber').value) || 0,
+            resultadoDebe: parseFloat(fila.querySelector('.resultadoDebe').value) || 0,
+            resultadoHaber: parseFloat(fila.querySelector('.resultadoHaber').value) || 0,
+            capitalDebe: parseFloat(fila.querySelector('.capitalDebe').value) || 0,
+            capitalHaber: parseFloat(fila.querySelector('.capitalHaber').value) || 0,
+            generalDebe: parseFloat(fila.querySelector('.generalDebe').value) || 0,
+            generalHaber: parseFloat(fila.querySelector('.generalHaber').value) || 0,
+            resultadoCheckbox: fila.querySelector('.checkEstadoResultado').checked,  // Estado del checkbox de ajuste
+            capitalCheckbox: fila.querySelector('.checkEstadoCapital').checked  // Estado del checkbox de resultado
+        };
+        cuentas.push(cuentaData);
+    });
+    // Enviar datos al backend
+    fetch('/estados_financieros/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            cuentas: cuentas,
+            utilidadInvertida: aInvertir,
+            noReinvertido: noInvertido,
+            cuentaCapitalD: cuentaCapitalDebe,
+            cuentaCapitalH: cuentaCapitalHaber,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Cierre contable guardado exitosamente');
+            window.location.href = '/estados_financieros/';
+        } else {
+            alert('Hubo un error al guardar el cierre contable');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+ 
+</script>
+{% endblock %}

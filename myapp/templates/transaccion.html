@@ -60,13 +60,20 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
+        thead {
+        background-color: #d9d1d1; /* Color de fondo de los encabezados */
+        position: sticky; /* Permite que el encabezado sea "pegajoso" */
+        top: 0; /* Mantiene el encabezado en la parte superior */
+        z-index: 10; /* Asegura que los encabezados estén por encima de otras celdas */
+        }
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
-        th {
-            background-color: #f2f2f2;
+        th{
+            padding: 8px;
+            text-align: left;
         }
         .total {
             text-align: right;
@@ -115,7 +122,7 @@
         </div>
         <div class="form-group">
             <label for="agregarIVA">Aplicar IVA</label>
-            <input type="checkbox" id="agregarIVA"> 
+            <input type="checkbox" id="agregarIVA" name="agregarIVA" value="on"> 
         </div>
         <div class="form-group">
             <label for="descripcion">Descripción</label>

@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constrol de Costos</title>
+</head>
+<body onload="obtenerDatos()">
+    <hr class="my-4">
+    <div class="container">
+        <div class="row">
+            <h5 class="text-center">Asignacion de Empleados</h5>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="d-flex justify-content-center">
+                    <select name="empleados" id="empleados" class="form-select-sm d-flex" aria-label=".form-select-sm example" multiple>
+                        {% for empleado in empleados %}
+                        {% if empleado.puesto == 'Senior' or empleado.puesto == 'Junior' %}
+                        <option value="{{ empleado.id }}">{{ empleado.puesto }} | {{ empleado.nombre }} | </t> {{ empleado.costo_mensual }} </option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="d-flex justify-content-center">
+                    <button class="align-middle btn btn-info" onclick="moverOpciones ('empleados', 'asignaciones')">&gt;&gt;</button>
+                    <button class="align-middle btn btn-info" onclick="moverOpciones ('asignaciones', 'empleados')">&lt;&lt;</button>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="d-flex justify-content-center">
+                    <form method="post" name="crear_orden" id="crear_orden" class="form d-flex">
+                        {% csrf_token %}
+                        <select name="asignaciones" id="asignaciones" class="form-select-sm" aria-label=".form-select-sm example" multiple>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4">
+    <div class="container">
+        <div class="row">
+            <h5 class="text-center">Control de Costos</h5>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <h6>Mano de obra directa - MOD: </h6><p id="mo_directa"></p>
+                <h6>Mano de obra indirecta - MOI: </h6><p id="mo_indirecta"></p>
+                <h6>Horas mano de obra - MOH: </h6><p id="mo_horas"></p>
+                <h6>Costos indirectos de fabricacion - CIF: </h6><p id="cif"></p>
+            </div>
+            <div class="col-sm">
+                <h6>Total de CIF: </h6><p id="total_cif"></p>
+                <h6>Tasa de CIF: </h6><p id="tasa_cif"></p>
+                <h6>Total de LOC: </h6><p id="total_loc"></p>
+                <h6>Costo por linea de codigo: </h6><p id="costo_por_linea"></p>
+            </div>
+            <div class="col-sm">
+                <div><h5>Estimaciones</h5></div>
+                <label for="lineas_mes">Lineas de Codigo al Mes:</label>
+                <input type="number" name="lineas_mes" class="form-control" placeholder="1" step="1" min="1" max="" required="" id="lineas_mes" value="" oninput="calcularCostos()">
+                <h6>Tiempo estimado: </h6><p><p id="tiempo_estimado"></p> meses</p>  
+                <h6>Costo del producto: </h6><p id="costo_producto"></p>
+                <h6>Precio de venta: </h6><p id="precio_venta"></p>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4">
+    <div class="container">
+        <h5 class="text-center">Estimación en base a lineas de codigo - LOC</h5>
+        <table id="estimacion" class="table table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre Modulo</th>
+                    <th>Descripción</th>
+                    <th>Optimista</th>
+                    <th>Probable</th>
+                    <th>Pesimista</th>
+                    <th>Lineas Esperadas</th>
+                    <th>Costo por Modulo</th>
+                    <th> - </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button class="btn btn-success" onclick="agregarFila()">Agregar Modulo</button>
+    </div>
+    <hr class="my-4">
+    <button class="btn btn-primary" onclick="enviarDatos()">Enviar Datos</button>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    var data = null;
+
+    function moverOpciones (fromSelectId, toSelectId) {
+        const fromSelect = document.getElementById(fromSelectId);
+        const toSelect = document.getElementById(toSelectId);
+        const selectedOptions = Array.from(fromSelect.selectedOptions);
+        const mo_directa = document.getElementById('mo_directa');
+        const mo_indirecta = document.getElementById('mo_indirecta');
+        const mo_cif = document.getElementById('cif');
+        const costo_por_linea = document.getElementById('costo_por_linea');
+
+        let costo_directo = 0;
+        let costo_indirecto = 0;
+        let cif = 0;
+
+        selectedOptions.forEach(option => {
+            toSelect.appendChild(option);
+        });
+
+        const asignaciones = document.getElementById('asignaciones');
+        const empleados =  asignaciones.getElementsByTagName('option');
+
+        for (let i = 0; i < data.length; i++) {
+            for(let e = 0; e < empleados.length; e++) {
+                if(data[i].id == empleados[e].getAttribute('value'))
+                    costo_directo += parseFloat(data[i].costo_mensual);
+                else {
+                    costo_indirecto += parseFloat(data[i].costo_mensual);
+                    cif += parseFloat(data[i].costo_mensual) * 0.05;
+                }
+            }
+        }
+        mo_directa.innerText = costo_directo.toFixed(2);
+        mo_indirecta.innerText = costo_indirecto.toFixed(2);
+        mo_cif.innerText = cif.toFixed(2);
+        calcularCostoLOC();
+        calcularCostos();
+    }
+
+    function obtenerDatos() {
+        $.ajax({
+            url: "{% url 'get_empleados' %}",
+            type: 'GET',
+            success: function(response) {
+                data = response;
+            },
+            error: function(response) {
+                console.log(response.responseJSON.errors)
+            }
+        });
+        return false;
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function agregarFila() {
+            const table = document.getElementById('estimacion').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td contenteditable="true" class="editable"></td>
+                <td contenteditable="true" class="editable"></td>
+                <td contenteditable="true" class="editable" oninput="validarNumero(this)">0</td>
+                <td contenteditable="true" class="editable" oninput="validarNumero(this)">0</td>
+                <td contenteditable="true" class="editable" oninput="validarNumero(this)">0</td>
+                <td contenteditable="false" class="" id="lineas_estimadas">0</td>
+                <td contenteditable="false" class="" id="costo_estimado">0</td>
+                <td><button class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button></td>
+            `;
+        }
+
+        function eliminarFila(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        function enviarDatos() {
+            
+            const table = document.getElementById('estimacion');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const lineas_mes = document.getElementById('lineas_mes');
+            const mo_directa = document.getElementById('mo_directa');
+            const mo_indirecta = document.getElementById('mo_indirecta');
+            const mo_cif = document.getElementById('cif');
+            const costo_por_linea = document.getElementById('costo_por_linea');
+            const tiempo_estimado = document.getElementById('tiempo_estimado');
+            const costo_estimado = document.getElementById('costo_producto');
+            const precio_estimado = document.getElementById('precio_venta');
+            const node_tasa_cif = document.getElementById('tasa_cif');
+            const node_total_cif = document.getElementById('total_cif');
+            const mo_horas = document.getElementById('mo_horas');
+            const total_loc = document.getElementById('total_loc')
+
+            const datos = [];
+
+            datos.push({mod: mo_directa.innerText, moi: mo_indirecta.innerText
+                , moh: mo_horas.innerText, cif: mo_cif.innerText
+                , total_cif: node_total_cif.innerText, tasa_cif: node_tasa_cif.innerText
+                , total_loc: total_loc.innerText, costo_por_linea: costo_por_linea.innerText
+                , lineas_mes: lineas_mes.value || 1, tiempo_estimado: tiempo_estimado.innerText
+                , costo_producto: costo_estimado.innerText, precio_venta: precio_venta.innerText
+            });
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const fila = {
+                    nombre_modulo: cells[0].innerText,
+                    descripcion: cells[1].innerText,
+                    optimista: cells[2].innerText,
+                    probable: cells[3].innerText,
+                    pesimista: cells[4].innerText,
+                    lineas_esperadas: cells[5].innerText,
+                    costo_modulo: cells[6].innerText
+                };
+                datos.push(fila);
+            }
+
+            $.ajax({
+                url: "{% url 'control_de_costos' %}",
+                type: 'POST',
+                data: JSON.stringify(datos),
+                contentType: 'application/json',
+                success: function(response) {
+                    alert('Datos enviados exitosamente');
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        function validarNumero(cell) {
+
+            const numberRegex = /^\d+$/; 
+            const value = cell.innerText;
+            
+            if (!numberRegex.test(value)) {
+                cell.innerText = value.slice(0, -1);
+            }
+            else {
+                estimarLineas(cell);
+                calcularCostos();
+            }
+        }
+
+        function calcularCostos() {
+            const lineas_mes = document.getElementById('lineas_mes');
+            const mo_directa = document.getElementById('mo_directa');
+            const mo_indirecta = document.getElementById('mo_indirecta');
+            const mo_cif = document.getElementById('cif');
+            const costo_por_linea = document.getElementById('costo_por_linea');
+            const tiempo_estimado = document.getElementById('tiempo_estimado');
+            const costo_estimado = document.getElementById('costo_producto');
+            const precio_estimado = document.getElementById('precio_venta');
+            const node_tasa_cif = document.getElementById('tasa_cif');
+            const node_total_cif = document.getElementById('total_cif');
+            const mo_horas = document.getElementById('mo_horas');
+
+            let tiempo = 0, precio_venta = 0, costo_producto = 0, totalLOC = 0, lineas_programadas = 0, precio_por_LOC = 0;
+            precio_por_LOC = parseFloat(costo_por_linea.innerText);
+            totalLOC = calcularTotalLOC() || 1;
+            lineas_programadas = parseFloat(lineas_mes.value) || 1;
+
+            tiempo = totalLOC / lineas_programadas;
+
+            costo_producto = totalLOC * precio_por_LOC;
+            precio_venta = costo_producto + costo_producto * 0.3;
+            costo_estimado.innerText = costo_producto.toFixed(2);
+            tiempo_estimado.innerText = tiempo.toFixed(2).toString();
+            precio_estimado.innerText = precio_venta.toFixed(2);
+            
+            const asignaciones = document.getElementById('asignaciones');
+            let numero_asignaciones = 0, tasa_cif = 0, total_cif = 0, mano_obra_horas = 0;
+
+            numero_asignaciones = parseFloat(document.getElementById('asignaciones').childElementCount);
+            total_cif = parseFloat(mo_cif.innerText) + parseFloat(mo_indirecta.innerText);
+            mano_obra_horas = 160 * numero_asignaciones;
+            tasa_cif = total_cif / mano_obra_horas;
+
+            
+            console.log(total_cif + " " + tasa_cif);
+            node_tasa_cif.innerText = tasa_cif.toFixed(2);
+            node_total_cif.innerText = total_cif;
+            mo_horas.innerText = mano_obra_horas.toString();
+        }
+
+        function estimarLineas(cell) {
+            const row = cell.parentNode;
+            const cells = row.getElementsByTagName('td');
+            const costo_por_linea = document.getElementById('costo_por_linea');
+            let estimacion = 0, optimista = 0, probable = 0, pesimista = 0,  costo_modulo = 0;
+            optimista = parseFloat(cells[2].innerText);
+            probable = parseFloat(cells[3].innerText);
+            pesimista = parseFloat(cells[4].innerText);
+            estimacion = (optimista + (4 * probable) + pesimista) / 6;
+            cells[5].innerText = Math.round(estimacion) || 0;
+            calcularCostoModulos();
+        }
+
+        function calcularCostoModulos() {
+            const table = document.getElementById('estimacion');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            let estimadas = 0, costo_modulo = 0;
+
+            for(let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                estimadas = parseFloat(cells[5].innerText);
+                costo_modulo = estimadas * calcularCostoLOC();
+                cells[6].innerText = costo_modulo.toFixed(2) || 0;
+            }
+        }
+
+        function calcularCostoLOC() {
+
+            const table = document.getElementById('estimacion');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const mo_directa = document.getElementById('mo_directa');
+            const mo_indirecta = document.getElementById('mo_indirecta');
+            const mo_cif = document.getElementById('cif');
+            const costo_por_linea = document.getElementById('costo_por_linea');
+
+            let costos = 0;
+            costos = parseFloat(mo_directa.innerText) + parseFloat(mo_cif.innerText) + parseFloat(mo_indirecta.innerText);
+
+            let total_lineas_estimadas = 0, lineas_estimadas = 0, precio_por_linea = 0;
+
+            total_lineas_estimadas = calcularTotalLOC();
+
+            if(total_lineas_estimadas == 0)
+                total_lineas_estimadas = 1;
+
+            precio_por_linea = costos / total_lineas_estimadas;
+            costo_por_linea.innerText = precio_por_linea.toFixed(2);
+
+            return precio_por_linea;
+        }
+
+        function calcularTotalLOC() {
+            const table = document.getElementById('estimacion');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            const total_lineas = document.getElementById('total_loc');
+            let total_LOC = 0, lineas_estimadas = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                lineas_estimadas = parseFloat(cells[5].innerText) || 0;
+                total_LOC += lineas_estimadas;
+            }
+            total_lineas.innerText = total_LOC.toString();
+            return total_LOC;
+        }
+
+    </script>  
+</html>
+{% endblock %}

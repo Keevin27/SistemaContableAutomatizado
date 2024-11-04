@@ -25,24 +25,6 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .table-container {
-            max-height: 400px; /* Tamaño de la tabla con scroll */
-            overflow-y: auto;
-            border: 1px solid #ddd;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
         #agregar-btn {
             margin-top: 10px;
             padding: 10px;
@@ -61,6 +43,26 @@
             border: 1px solid #ddd; /* Borde opcional */
             margin-top: 20px; /* Margen superior para separación */
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        thead {
+        background-color: #d9d1d1; /* Color de fondo de los encabezados */
+        position: sticky; /* Permite que el encabezado sea "pegajoso" */
+        top: 0; /* Mantiene el encabezado en la parte superior */
+        z-index: 10; /* Asegura que los encabezados estén por encima de otras celdas */
+        }
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th{
+            padding: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -68,7 +70,28 @@
         <h2>Libro Mayor</h2>
         <form id="formulario" method = "POST">
             {% csrf_token %}
-
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cuenta</th>
+                            <th>saldo debe</th>
+                            <th>saldo haber</th>
+                            <th>saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cuenta in cuentas %}
+                        <tr>
+                            <td>{{ cuenta.nombre }}</td>
+                            <td>{{ cuenta.debe|floatformat:2 }}</td>
+                            <td>{{ cuenta.haber|floatformat:2 }}</td>
+                            <td>{{ cuenta.diferencia|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <div class="form-group">
                 <label for="cuentaRevisar">Seleccione la cuenta para ver su estado financiero :</label>
                 <select  id="cuentaRevisar" name="cuentaRevisar" required>
