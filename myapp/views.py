@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from .models import *
 from .forms import *
@@ -324,26 +325,29 @@ def orden_de_desarrollo(request):
 
     return render(request)
 
+@csrf_exempt
 def control_de_costos(request):
-    
     if request.method == 'POST':
         
         datos = json.loads(request.body.decode('utf-8'))
         orden = OrdenDeDesarrollo()
         
         costos = datos[0]
-        orden.mod = costos.get('mod')
-        orden.moi = costos.get('moi')
-        orden.moh = costos.get('moh')
-        orden.cif = costos.get('cif')
-        orden.total_cif = costos.get('total_cif')
-        orden.tasa_cif = costos.get('tasa_cif')
-        orden.total_loc = costos.get('total_loc')
-        orden.costo_por_linea = costos.get('costo_por_linea')
-        orden.lineas_mes = costos.get('lineas_mes')
-        orden.tiempo_estimado = costos.get('tiempo_estimado')
-        orden.costo_producto = costos.get('costo_producto')
-        orden.precio_venta = costos.get('precio_venta')
+        print(costos)
+
+        print(costos.get('mod'))
+        orden.mod = Decimal(costos.get('mod'))
+        orden.moi = Decimal(costos.get('moi'))
+        orden.moh = Decimal(costos.get('moh'))
+        orden.cif = Decimal(costos.get('cif'))
+        orden.total_cif = Decimal(costos.get('total_cif'))
+        orden.tasa_cif = Decimal(costos.get('tasa_cif'))
+        orden.total_loc = Decimal(costos.get('total_loc'))
+        orden.costo_por_linea = Decimal(costos.get('costo_por_linea'))
+        orden.lineas_mes = Decimal(costos.get('lineas_mes'))
+        orden.tiempo_estimado = Decimal(costos.get('tiempo_estimado'))
+        orden.costo_producto = Decimal(costos.get('costo_producto'))
+        orden.precio_venta = Decimal(costos.get('precio_venta'))
         orden.save()
         datos.pop(0)
 
@@ -351,11 +355,11 @@ def control_de_costos(request):
             modulo = Modulo()
             modulo.nombre_modulo = dato.get('nombre_modulo')
             modulo.descripcion = dato.get('descripcion')
-            modulo.optimista = dato.get('optimista')
-            modulo.probable = dato.get('probable')
-            modulo.pesimista = dato.get('pesimista')
-            modulo.lineas_esperadas = dato.get('lineas_esperadas')
-            modulo.costo_modulo = dato.get('costo_modulo')
+            modulo.optimista = int(dato.get('optimista'))
+            modulo.probable = int(dato.get('probable'))
+            modulo.pesimista = int(dato.get('pesimista'))
+            modulo.lineas_esperadas = int(dato.get('lineas_esperadas'))
+            modulo.costo_modulo = int(dato.get('costo_modulo'))
             modulo.orden_desarrollo = orden
             modulo.save()
 
