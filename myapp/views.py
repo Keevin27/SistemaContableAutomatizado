@@ -78,38 +78,6 @@ def generar_codigo(clasificacion):
         codigo = f"61{totalstr}"
     return codigo
 
-def costo_mano_obra(request):
-
-    if request.method == 'POST':
-        
-        form = EmpleadoForm(request.POST)
-        if form.is_valid():
-            empleado = Empleado()
-            nominal = form.cleaned_data['nominal']
-            vacaciones = (nominal * 15 + (Decimal(0.3) * nominal * 15))/52
-            septimo = nominal * 2
-            aguinaldo = (21 * nominal) / 52
-            salario = nominal * 5 + septimo + aguinaldo + vacaciones
-            isss = salario * Decimal(0.075)
-            afp = salario * Decimal(0.08)
-            costo = salario + isss + afp
-            empleado.nombre = form.cleaned_data['nombre']
-            empleado.puesto = form.cleaned_data['puesto']
-            empleado.nominal = nominal
-            empleado.vacaciones = vacaciones
-            empleado.septimo = septimo
-            empleado.aguinaldo = aguinaldo
-            empleado.salario = salario
-            empleado.isss = isss
-            empleado.afp = afp
-            empleado.insaforp = 0
-            empleado.costo = costo
-            empleado.save()
-            return redirect('costo_mano_obra')  # Redirige a una lista de empleados o a donde prefieras obviamente :v
-    else:
-        form = EmpleadoForm()
-    return render(request, 'costo_mano_obra.html', {'form': form, 'empleados': Empleado.objects.all()})
-
 def eliminar_empleado(request):
     if request.method == 'POST':
         data = request.POST
@@ -201,6 +169,7 @@ def nuevo_periodo():
     periodo = Periodo(numero = numeroPeriodo, fecha_inicio = fechaInicio)
     periodo.save()
     return periodo
+
 def costo_mano_obra(request):
 
     if request.method == 'POST':
@@ -359,7 +328,7 @@ def control_de_costos(request):
             modulo.probable = int(dato.get('probable'))
             modulo.pesimista = int(dato.get('pesimista'))
             modulo.lineas_esperadas = int(dato.get('lineas_esperadas'))
-            modulo.costo_modulo = int(dato.get('costo_modulo'))
+            modulo.costo_modulo = Decimal(dato.get('costo_modulo'))
             modulo.orden_desarrollo = orden
             modulo.save()
 
