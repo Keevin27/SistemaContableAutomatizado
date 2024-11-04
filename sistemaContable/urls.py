@@ -24,7 +24,10 @@ urlpatterns = [
     path('catalogo_de_cuentas/', catalogoDeCuentas, name='catalogodecuentas'),
     path('catalogo_de_cuentas/agregar_cuenta/', agregarCuenta, name='agregarcuenta'),
     path('costo_mano_obra', costo_mano_obra, name='costo_mano_obra'),
+    path('costo_mano_obra/actualizar_empleado', actualizar_empleado, name='actualizar_empleado'),
     path('costo_mano_obra/eliminar_empleado', eliminar_empleado, name='eliminar_empleado'),
     path('estados_financieros/', estadosFinancieros, name='estadosfinancieros'),
     path('estados_financieros/<int:numPeriodo>/', consultarEstadosFinancieros, name='consultarEstadosfinancieros'),
+    path('control_de_costos', control_de_costos, name='control_de_costos'),
+    path('get_empleados', get_empleados, name='get_empleados'),
 ]

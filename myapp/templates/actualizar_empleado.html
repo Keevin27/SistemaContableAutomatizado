@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Actualizar Empleado</title>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <h1 style="text-align: center;">Actualizar Empleado</h1>
+            <form method="post" id="actualizar_empleado" name="actualizar_empleado" class="form-inline">
+                <div class="form-group mb-2">
+                    {% csrf_token %}
+                    <label for="id_id">ID:</label>   
+                    <input type="number" name="id" class="form-control" placeholder="ID del empleado" step="1" min="0" max="100" readonly required="" id="id_id" value="{{ empleado.id }}">
+                    <label for="id_nombre">Nombre:</label>   
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre del empleado" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+" maxlength="120" minlength="3" required="" id="id_nombre" value="{{ empleado.nombre }}">
+                    <label for="id_nominal">Nominal:</label>
+                    <input type="number" name="nominal" class="form-control" placeholder="$0.00" step="0.01" required="" id="id_nominal" value="{{ empleado.nominal }}">
+                    <label for="id_puesto">Puesto:</label>
+                    <input type="text" name="puesto" class="form-control" placeholder="Puesto del empleado" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+" maxlength="120" minlength="3" required="" id="id_puesto" value="{{ empleado.puesto }}">
+                    <label for="id_anios">Años:</label> 
+                    <input type="number" name="anios" class="form-control" placeholder="1" step="1" min="0" max="100" required="" id="id_anios" value="{{ empleado.anios }}">
+                    <button type="submit" form="actualizar_empleado" class="btn btn-primary ml-3 mt-1">Guardar</button>
+                    <a class="btn btn-danger m1-3 mt-1" href="/costo_mano_obra">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </body>
+<script src="{% static '/js/mo.js' %}" ></script>
+</html>
+{% endblock %}
