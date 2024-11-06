@@ -17,8 +17,37 @@
     <hr class="my-4">
     <div class="container">
         <div class="row">
+            <h5 class="text-center">Mano de Obra</h5>
+        </div>
+        <div class="row">
+            <table class="table table-striped table-hover" id="costo_indirecto">
+                <thead>
+                    <tr>
+                        <th scope="col" id="nombre_mo">Nombre</th>
+                        <th scope="col" id="puesto_mo">Puesto</th>
+                        <th scope="col" id="salario_mo">Salario Nominal</th>
+                        <th scope="col" id="costo_mensual_mo">Costo Mensual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in empleados %}
+                    {% if empleado.puesto == 'Senior' or empleado.puesto == 'Junior' %}
+                    <tr>
+                        <td>{{ empleado.nombre }}</td>
+                        <td>{{ empleado.puesto }}</td>
+                        <td>{{ empleado.nominal }}</td>
+                        <td>{{ empleado.costo_mensual }}</td>
+                        <td></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
             <h5 class="text-center">Asignacion de Empleados</h5>
         </div>
+        <div class="row">
         <div class="row">
             <div class="col-sm">
                 <div class="d-flex justify-content-center">
@@ -51,7 +80,7 @@
     <hr class="my-4">
     <div class="container">
         <div class="row">
-            <h5 class="text-center">Costos</h5>
+            <h5 class="text-center">Estimación de Costos</h5>
         </div>
         <div class="row">
             <div class="col-sm">
@@ -64,6 +93,7 @@
                 <h6>Total de CIF: </h6><p id="total_cif"></p>
                 <h6>Tasa de CIF: </h6><p id="tasa_cif"></p>
                 <h6>Total de LOC: </h6><p id="total_loc"></p>
+                <h6>Total de CI: </h6><p id="total_ci">500</p>
                 <h6>Costo por linea de codigo: </h6><p id="costo_por_linea"></p>
             </div>
             <div class="col-sm">
@@ -72,7 +102,7 @@
                 <input type="number" name="lineas_mes" class="form-control" placeholder="1" step="1" min="1" max="" required="" id="lineas_mes" value="" oninput="calcularCostos()">
                 <h6>Tiempo estimado: </h6><p><p id="tiempo_estimado"></p> meses</p>  
                 <h6>Costo del producto: </h6><p id="costo_producto"></p>
-                <h6>Precio de venta: </h6><p id="precio_venta"></p>
+                <h6>Precio de venta (30% de recargo del costo): </h6><p id="precio_venta"></p>
             </div>
         </div>
     </div>
@@ -282,7 +312,7 @@
             tasa_cif = total_cif / mano_obra_horas;
 
             
-            console.log(total_cif + " " + tasa_cif);
+            console.log(total_cif + " " + tasa_cif + " " + cif);
             node_tasa_cif.innerText = tasa_cif.toFixed(2);
             node_total_cif.innerText = total_cif;
             mo_horas.innerText = mano_obra_horas.toString();
@@ -324,7 +354,7 @@
             const costo_por_linea = document.getElementById('costo_por_linea');
 
             let costos = 0;
-            costos = parseFloat(mo_directa.innerText) + parseFloat(mo_cif.innerText) + parseFloat(mo_indirecta.innerText);
+            costos = parseFloat(mo_directa.innerText) + parseFloat(mo_cif.innerText) + parseFloat(mo_indirecta.innerText) + 500;
 
             let total_lineas_estimadas = 0, lineas_estimadas = 0, precio_por_linea = 0;
 

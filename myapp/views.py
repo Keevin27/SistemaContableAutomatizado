@@ -200,7 +200,7 @@ def costo_mano_obra(request):
 
             isss = salario * Decimal(0.075)
             afp = salario * Decimal(0.08)
-            insaforp = 0
+            insaforp = salario * Decimal(0.01)
 
             costo = salario + vacaciones + isss + afp + insaforp
             factor = costo / (nominal * 5)
@@ -256,7 +256,7 @@ def actualizar_empleado(request):
 
             isss = salario * Decimal(0.075)
             afp = salario * Decimal(0.08)
-            insaforp = 0
+            insaforp = salario * Decimal(0.01)
 
             costo = salario + vacaciones + isss + afp + insaforp
             factor = costo / (nominal * 5)
