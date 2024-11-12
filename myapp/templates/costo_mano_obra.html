@@ -37,7 +37,7 @@
                             <button type="submit" form="tabla_empleados" class="btn btn-success" onclick="actualizar('costo_mano_obra/actualizar_empleado')">Actualizar</button>
                         </div>
                         <div class="col-sm">
-                            <h6>Total de costos - semanales: </h6><p id="total_costos"></p>
+                            <h6>Total de costos: </h6><p id="total_costos"></p>
                             <h6>Factor de Recargo: </h6><p id="factor_recargo"></p>                     
                         </div>
                         <div class="col-sm">
@@ -58,7 +58,7 @@
                                 <th scope="col" id="septimo">Desembolso Semanal</th>
                                 <th scope="col" id="isss">ISSS</th>
                                 <th scope="col" id="afp">AFP</th>
-                                <th scope="col" id="insaforp">INCAF</th>
+                                <th scope="col" id="insaforp">INSAFORP</th>
                                 <th scope="col" id="costo">Costo Semanal</th>
                             </tr>
                         </thead>
@@ -116,8 +116,8 @@
                             <td>{{ empleado.nombre }}</td>
                             <td>{{ empleado.puesto }}</td>
                             <td>{{ empleado.nominal }}</td>
+                            <td>{{ empleado.salario }}</td>
                             <td>{{ empleado.costo_mensual }}</td>
-                            <td>{{ empleado.cif }}</td>
                             <td></td>
                         </tr>
                         {% endif %}
